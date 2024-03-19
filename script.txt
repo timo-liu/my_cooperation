@@ -1,0 +1,14 @@
+public float mean_tolerance = 1.0;
+public float std_tolerance = 0.2;
+public float mean_value = 1.0;
+public float std_value = 0.2;
+public float agent_std_value = 0.1;	
+public float prop_deviant = 0.2;
+public float deviant_mean_tolerance = 2.0, 0.5;
+public boolean paramSweeps = true;
+public boolean closeProgramAtend = false;
+public int burnIn = 0;
+public long simLength = 1001;
+public int dataSamplingInterval = 10;
+public double scheduleTimeInterval = 1.0;
+public int simNumber = 1;
