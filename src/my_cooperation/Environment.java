@@ -2,8 +2,6 @@ package my_cooperation;
 
 import sweep.SimStateSweep;
 import sim.util.Bag;
-import spaces.Spaces;
-import sweep.SimStateSweep;
 import sim.util.distribution.Normal;
 
 public class Environment extends SimStateSweep {
@@ -28,6 +26,10 @@ public class Environment extends SimStateSweep {
 	
 	public float prop_deviant = 0.2f;
 	public float deviant_mean_tolerance = 2.0f;
+	
+	public int max_strikes = 3;
+	
+	public boolean charts = false;
 	
 
 	public Environment(long seed) {
@@ -101,7 +103,7 @@ public class Environment extends SimStateSweep {
 				Agent agent = new Agent(this, tolerance, mean_value, agent_std_value, random_x, random_y, i, g.group_id, type);
 				agents.add(agent);
 				g.add_agent(agent);
-				schedule.scheduleRepeating(agent);
+				schedule.scheduleRepeating(agent, 1, 1.0);
 				sparseSpace.setObjectLocation(agent, random_x, random_y);
 			}
 		}
@@ -111,9 +113,8 @@ public class Environment extends SimStateSweep {
 	
 	public void start() {
 		super.start();
-		spaces = Spaces.SPARSE;
 		this.makeSpace(gridWidth, gridHeight);
-		System.out.println("Made space");
+		//System.out.println("Made space");
 		make_groups();
 		make_agents();
 		// initialize the experimenter by calling initialize in the parent class
@@ -160,14 +161,6 @@ public class Environment extends SimStateSweep {
 
 	public void setGridHeight(int gridHeight) {
 		this.gridHeight = gridHeight;
-	}
-
-	public int getGridWidth() {
-		return gridWidth;
-	}
-
-	public void setGridWidth(int gridWidth) {
-		this.gridWidth = gridWidth;
 	}
 
 	public int getMin_distance_groups() {
@@ -232,6 +225,14 @@ public class Environment extends SimStateSweep {
 
 	public void setDeviant_mean_tolerance(float deviant_mean_tolerance) {
 		this.deviant_mean_tolerance = deviant_mean_tolerance;
+	}
+
+	public int getMax_strikes() {
+		return max_strikes;
+	}
+
+	public void setMax_strikes(int max_strikes) {
+		this.max_strikes = max_strikes;
 	}
 
 }

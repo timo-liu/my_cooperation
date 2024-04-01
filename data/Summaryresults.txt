@@ -1,0 +1,74 @@
+Parameter Sweeps
+
+Number of parameters swept: 2
+
+Table of parameters swept 
+public	float	deviant_mean_tolerance	2.0	0.5	
+
+Parameter values for the class class my_cooperation.Environment
+num_groups  13
+num_agents_per_group  5
+gridHeight  100
+gridWidth  100
+min_distance_groups  5
+mean_tolerance  1.0
+std_tolerance  0.2
+mean_value  1.0
+std_value  0.2
+agent_std_value  0.1
+prop_deviant  0.2
+deviant_mean_tolerance  2.0
+charts  false
+nameSpace  SPARSE
+gridWidth  100
+gridHeight  100
+paramSweeps  true
+simLength  101
+simNumber  2
+fileDataName  results.txt
+folderDataName  data
+dataSamplingInterval  1
+burnIn  0
+scheduleTimeInterval  1.0
+closeProgramAtend  true
+customSweepOnly  false
+deviant_mean_tolerance	Value	Step	Reps	a	b	Step	Reps	a	b	
+deviant_mean_tolerance	2.0	100.000	202.000	316.963	289.542	100.000	202.000	9.108	9.093
+deviant_mean_tolerance	0.5	100.000	202.000	263.272	373.971	100.000	202.000	3.017	4.167
+Parameter Sweeps
+
+Number of parameters swept: 2
+
+Table of parameters swept 
+public	float	deviant_mean_tolerance	2.0	0.5	
+
+Parameter values for the class class my_cooperation.Environment
+num_groups  13
+num_agents_per_group  5
+gridHeight  100
+gridWidth  100
+min_distance_groups  5
+mean_tolerance  1.0
+std_tolerance  0.2
+mean_value  1.0
+std_value  0.2
+agent_std_value  0.1
+prop_deviant  0.2
+deviant_mean_tolerance  2.0
+charts  false
+nameSpace  SPARSE
+gridWidth  100
+gridHeight  100
+paramSweeps  true
+simLength  101
+simNumber  2
+fileDataName  results.txt
+folderDataName  data
+dataSamplingInterval  1
+burnIn  0
+scheduleTimeInterval  1.0
+closeProgramAtend  true
+customSweepOnly  false
+deviant_mean_tolerance	Value	Step	Reps	a	b	Step	Reps	a	b	
+deviant_mean_tolerance	2.0	100.000	202.000	282.667	286.668	100.000	202.000	8.844	8.844
+deviant_mean_tolerance	0.5	100.000	202.000	295.906	357.472	100.000	202.000	2.881	4.152

@@ -6,8 +6,8 @@ for the data can also be specified. The form of the script is specified below:*/
 
 Scriptname: script.txt // The name of the file for parameter sweeps
 DataFolder: data //Folder holding simulation results
-DataFile: results1.txt //Name of results file.
+DataFile: results.txt //Name of results file.
 CheckSweepOptions: true //Determines whether parameter sweeps is automatically checked.
-ColumnHeaders: Avg_Deviant_Payoff, Avg_Standard_Payoff //The column headers for the data file, 'steps' and 'rep' are prepended to this list
+ColumnHeaders: a, b //The column headers for the data file, 'steps' and 'rep' are prepended to this list
 Precision: 3  //Numerical precision for data, must be an integer.
 stopWhenNoAgents: true  //The simulation will stop when there are no agents left, else it will run to the stopping time even if there are not agents.
