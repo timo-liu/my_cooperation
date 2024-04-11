@@ -6,9 +6,6 @@ import sim.util.Bag;
 import sim.util.distribution.Normal;
 import java.util.Random;
 
-import cooperation.Agent;
-import cooperation.Environment;
-
 import java.lang.Math;
 
 public class Agent implements Steppable {
@@ -146,27 +143,27 @@ public class Agent implements Steppable {
 			int random_x = state.random.nextInt(5) + g.x;
 			int random_y = state.random.nextInt(5) + g.y;
 			
-			Bag b = state.sparseSpace.getObjectsAtLocation(random_x, random_y);
-			
-			while(!(b == null)) {
-				random_x = state.random.nextInt(5) + g.x;
-				random_y = state.random.nextInt(5) + g.y;
-				b = state.sparseSpace.getObjectsAtLocation(random_x, random_y);
-			}
-			state.sparseSpace.setObjectLocation(this, random_x, random_y);
+//			Bag b = state.sparseSpace.getObjectsAtLocation(random_x, random_y);
+//			
+//			while(!(b == null)) {
+//				random_x = state.random.nextInt(5) + g.x;
+//				random_y = state.random.nextInt(5) + g.y;
+//				b = state.sparseSpace.getObjectsAtLocation(random_x, random_y);
+//			}
+//			state.sparseSpace.setObjectLocation(this, random_x, random_y);
 		}
 		else {
 			int random_x = state.random.nextInt(state.gridWidth);
 			int random_y = state.random.nextInt(state.gridHeight);
 			
-			Bag b = state.sparseSpace.getObjectsAtLocation(random_x, random_y);
-			
-			while(!(b == null)) {
-				random_x = state.random.nextInt(state.gridWidth);
-				random_y = state.random.nextInt(state.gridHeight);
-				b = state.sparseSpace.getObjectsAtLocation(random_x, random_y);
-			}
-			state.sparseSpace.setObjectLocation(this, random_x, random_y);
+//			Bag b = state.sparseSpace.getObjectsAtLocation(random_x, random_y);
+//			
+//			while(!(b == null)) {
+//				random_x = state.random.nextInt(state.gridWidth);
+//				random_y = state.random.nextInt(state.gridHeight);
+//				b = state.sparseSpace.getObjectsAtLocation(random_x, random_y);
+//			}
+//			state.sparseSpace.setObjectLocation(this, random_x, random_y);
 		}
 	}
 
