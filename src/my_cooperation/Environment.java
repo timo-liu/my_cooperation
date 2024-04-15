@@ -26,14 +26,20 @@ public class Environment extends SimDataCollection {
 	//not tracked or input
 	Bag groups = new Bag();
 	Bag agents = new Bag();
+	
 	public boolean charts = false;
 
 	//data to collect
+	public int num_deviants = 0;
+	public int num_standards = 0;
 	public float avg_deviant_payoff; //average payoff across all deviants
 	public float  avg_standard_payoff; //average payoff across all standard agents
+	public int[] group_deviants; // int array of deviant counts
+	public int[] group_totals; // int array of group totals
+	
 	
 	public static void main(String[] args) {
-		Environment environment = new Environment("inputTemplate.txt");
+		Environment environment = new Environment("test_input.txt");
 	}
 	
 	//constructor 
@@ -53,6 +59,7 @@ public class Environment extends SimDataCollection {
 
 	public void make_groups() {
 		// make the groups first
+		this.groups = new Bag();
 		for(int i = 0; i < num_groups; i++) {
 			int random_x = random.nextInt(gridWidth);
 			int random_y = random.nextInt(gridHeight);
@@ -73,7 +80,8 @@ public class Environment extends SimDataCollection {
 	}
 
 	public void make_agents() {
-
+		
+		this.agents = new Bag();
 		Normal deviant_tolerance_norm = new Normal(deviant_mean_tolerance, std_tolerance, random);
 		Normal tolerance_norm = new Normal(mean_tolerance, std_tolerance, random);
 		Normal value_norm = new Normal(mean_tolerance, std_tolerance, random);
@@ -102,6 +110,7 @@ public class Environment extends SimDataCollection {
 
 				if (type == 1) {
 					tolerance = (float) deviant_tolerance_norm.nextDouble();
+					num_deviants++;
 				}
 
 				Agent agent = new Agent(this, tolerance, mean_value, agent_std_value, random_x, random_y, i, g.group_id, type);
@@ -267,5 +276,37 @@ public class Environment extends SimDataCollection {
 
 	public void setAvg_standard_payoff(float avg_standard_payoff) {
 		this.avg_standard_payoff = avg_standard_payoff;
+	}
+
+	public int getNum_deviants() {
+		return num_deviants;
+	}
+
+	public void setNum_deviants(int num_deviants) {
+		this.num_deviants = num_deviants;
+	}
+
+	public int getNum_standards() {
+		return num_standards;
+	}
+
+	public void setNum_standards(int num_standards) {
+		this.num_standards = num_standards;
+	}
+
+	public int[] getGroup_deviants() {
+		return group_deviants;
+	}
+
+	public void setGroup_deviants(int[] group_deviants) {
+		this.group_deviants = group_deviants;
+	}
+
+	public int[] getGroup_totals() {
+		return group_totals;
+	}
+
+	public void setGroup_totals(int[] group_totals) {
+		this.group_totals = group_totals;
 	}
 }

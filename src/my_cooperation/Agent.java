@@ -20,6 +20,8 @@ public class Agent implements Steppable {
 	int group_id; //current group identity
 	int type; // type 1 = deviant, type 0 = standard
 	
+	boolean skip_step = false;
+	
 	double[] memory; //tracks familiarity between groups so that they are more likely to join groups that they haven't worked with already
 	
 	boolean in_group = true; //if the agent is in a group, and is unsatisfied, then leave. otherwise, try and find an open group
@@ -58,11 +60,17 @@ public class Agent implements Steppable {
 			Group g = (Group) state.groups.get(this.group_id); //get the group, and see how many members there are
 			float num_in_group = (float) g.curr_agents.size();
 			compared_payoff = step_payoff/num_in_group;
-			this.accumulated_payoff += compared_payoff;
+			if (!this.skip_step) {
+				this.accumulated_payoff += compared_payoff;
+			}
+			else {
+				this.skip_step = false;
+			}
 			
 			if (compared_payoff < this.mean_value && Math.abs(this.mean_value - compared_payoff) > this.tolerance) {
 				this.strikes++;
 				if(this.strikes >= state.max_strikes) {
+					this.skip_step = true;
 					this.in_group = false;
 					this.group_id = -1;
 					g.remove_agent(this);
@@ -73,12 +81,18 @@ public class Agent implements Steppable {
 		}
 		else {
 			if (compared_payoff < this.mean_value && Math.abs(this.mean_value - compared_payoff) > this.tolerance) {
-				this.accumulated_payoff += compared_payoff;
+				if (!this.skip_step) {
+					this.accumulated_payoff += compared_payoff;
+				}
+				else {
+					this.skip_step = false;
+				}
 				this.strikes++;
 				if(this.strikes >= state.max_strikes) {
 
 						Group g = find_new_group(state);
 						if (g != null) {
+							this.skip_step = true;
 							this.in_group = true;
 							this.group_id = g.group_id;
 							g.add_agent(this);
