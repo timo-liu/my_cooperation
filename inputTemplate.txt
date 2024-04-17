@@ -40,7 +40,5 @@ agents =
 charts = 
 num_deviants = 
 num_standards = 
-group_deviants = 
-group_totals = 
 % Agent Parameters:
-*agentInfo = strikes id x y group_id type skip_step memory in_group 
+*agentInfo = strikes group_count group_id id type num_standards_in_group num_deviants_in_group x y skip_step memory in_group 

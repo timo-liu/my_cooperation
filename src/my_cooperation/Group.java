@@ -43,6 +43,20 @@ public class Group implements Steppable {
 		this.group_payoff = sum;
 	}
 	
+	public int[] group_constitution() {
+		int[] t = new int[2];
+		for(Object b: this.curr_agents) {
+			Agent a = (Agent) b;
+			if(a.type == 0){
+				t[0]++;
+			}
+			else {
+				t[1]++;
+			}
+		}
+		return t;
+	}
+	
 	@Override
 	public void step(SimState state) {
 		calc_group_payoff();

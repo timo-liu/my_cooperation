@@ -10,13 +10,13 @@ public class Environment extends SimDataCollection {
 	public int num_groups = 13; //number of groups that exist
 	public int num_agents_per_group = 5; // number of agents per group
 	public int max_strikes = 3; //num strikes before leaving
-	public float mean_tolerance = 1.0f;
-	public float std_tolerance = 0.2f;
-	public float mean_value = 1.0f;
-	public float std_value = 0.2f;
-	public float agent_std_value = 0.1f;
-	public float prop_deviant = 0.2f;
-	public float deviant_mean_tolerance = 2.0f;
+	public double mean_tolerance = 1.0f;
+	public double std_tolerance = 0.2f;
+	public double mean_value = 1.0f;
+	public double std_value = 0.2f;
+	public double agent_std_value = 0.1f;
+	public double prop_deviant = 0.2f;
+	public double deviant_mean_tolerance = 2.0f;
 
 	//GUI related parameters
 	public int gridHeight = 100;
@@ -32,11 +32,8 @@ public class Environment extends SimDataCollection {
 	//data to collect
 	public int num_deviants = 0;
 	public int num_standards = 0;
-	public float avg_deviant_payoff; //average payoff across all deviants
-	public float  avg_standard_payoff; //average payoff across all standard agents
-	public int[] group_deviants; // int array of deviant counts
-	public int[] group_totals; // int array of group totals
-	
+	public double avg_deviant_payoff; //average payoff across all deviants
+	public double  avg_standard_payoff; //average payoff across all standard agents
 	
 	public static void main(String[] args) {
 		Environment environment = new Environment("test_input.txt");
@@ -103,14 +100,17 @@ public class Environment extends SimDataCollection {
 
 				//Agent(Environment state, float tolerance, float mean_value, float std_value, int x, int y, int id, int group_id) {
 
-				float tolerance = (float) tolerance_norm.nextDouble();
-				float mean_value = (float) value_norm.nextDouble();
+				double tolerance = tolerance_norm.nextDouble();
+				double mean_value = value_norm.nextDouble();
 
 				int type = random.nextBoolean(prop_deviant) ? 1:0;
 
 				if (type == 1) {
-					tolerance = (float) deviant_tolerance_norm.nextDouble();
+					tolerance = deviant_tolerance_norm.nextDouble();
 					num_deviants++;
+				}
+				else {
+					num_standards++;
 				}
 
 				Agent agent = new Agent(this, tolerance, mean_value, agent_std_value, random_x, random_y, i, g.group_id, type);
@@ -158,7 +158,7 @@ public class Environment extends SimDataCollection {
 		this.max_strikes = max_strikes;
 	}
 
-	public float getMean_tolerance() {
+	public double getMean_tolerance() {
 		return mean_tolerance;
 	}
 
@@ -166,7 +166,7 @@ public class Environment extends SimDataCollection {
 		this.mean_tolerance = mean_tolerance;
 	}
 
-	public float getStd_tolerance() {
+	public double getStd_tolerance() {
 		return std_tolerance;
 	}
 
@@ -174,7 +174,7 @@ public class Environment extends SimDataCollection {
 		this.std_tolerance = std_tolerance;
 	}
 
-	public float getMean_value() {
+	public double getMean_value() {
 		return mean_value;
 	}
 
@@ -182,7 +182,7 @@ public class Environment extends SimDataCollection {
 		this.mean_value = mean_value;
 	}
 
-	public float getStd_value() {
+	public double getStd_value() {
 		return std_value;
 	}
 
@@ -190,7 +190,7 @@ public class Environment extends SimDataCollection {
 		this.std_value = std_value;
 	}
 
-	public float getAgent_std_value() {
+	public double getAgent_std_value() {
 		return agent_std_value;
 	}
 
@@ -198,7 +198,7 @@ public class Environment extends SimDataCollection {
 		this.agent_std_value = agent_std_value;
 	}
 
-	public float getProp_deviant() {
+	public double getProp_deviant() {
 		return prop_deviant;
 	}
 
@@ -206,7 +206,7 @@ public class Environment extends SimDataCollection {
 		this.prop_deviant = prop_deviant;
 	}
 
-	public float getDeviant_mean_tolerance() {
+	public double getDeviant_mean_tolerance() {
 		return deviant_mean_tolerance;
 	}
 
@@ -262,7 +262,7 @@ public class Environment extends SimDataCollection {
 		this.charts = charts;
 	}
 
-	public float getAvg_deviant_payoff() {
+	public double getAvg_deviant_payoff() {
 		return avg_deviant_payoff;
 	}
 
@@ -270,7 +270,7 @@ public class Environment extends SimDataCollection {
 		this.avg_deviant_payoff = avg_deviant_payoff;
 	}
 
-	public float getAvg_standard_payoff() {
+	public double getAvg_standard_payoff() {
 		return avg_standard_payoff;
 	}
 
@@ -294,19 +294,4 @@ public class Environment extends SimDataCollection {
 		this.num_standards = num_standards;
 	}
 
-	public int[] getGroup_deviants() {
-		return group_deviants;
-	}
-
-	public void setGroup_deviants(int[] group_deviants) {
-		this.group_deviants = group_deviants;
-	}
-
-	public int[] getGroup_totals() {
-		return group_totals;
-	}
-
-	public void setGroup_totals(int[] group_totals) {
-		this.group_totals = group_totals;
-	}
 }

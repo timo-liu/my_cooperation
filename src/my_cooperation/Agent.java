@@ -2,6 +2,7 @@ package my_cooperation;
 
 import sim.engine.SimState;
 import sim.engine.Steppable;
+import sim.engine.Stoppable;
 import sim.util.Bag;
 import sim.util.distribution.Normal;
 import java.util.Random;
@@ -9,28 +10,29 @@ import java.util.Random;
 import java.lang.Math;
 
 public class Agent implements Steppable {
-	float tolerance; //on an agent by agent basis, how long can this agent "tolerate" a negative group output from other agents
-	float mean_value; // mean value that an agent will contribute to a team
-	float std_value; //stdev of value that an agent will contribute
-	int strikes = 0; //setting strikes before leaving
-	
+	//to track
+	public Stoppable event;
+	double tolerance; //on an agent by agent basis, how long can this agent "tolerate" a negative group output from other agents
+	double mean_value; // mean value that an agent will contribute to a team
+	double std_value; //stdev of value that an agent will contribute
+	int group_count; //num agents in group the agent is in at the current step
+	int group_id;
 	int id; // agent unique id
-	int x; // x pos for visualization
-	int y; // y pos for visualization
-	int group_id; //current group identity
 	int type; // type 1 = deviant, type 0 = standard
-	
+	int num_standards_in_group; //tracking the number of standards in their group if they're in one
+	int num_deviants_in_group; // tracking the number of deviants in their group if they're in one
+	boolean in_group = true; //if the agent is in a group, and is unsatisfied, then leave. otherwise, try and find an open group
+	double accumulated_payoff = 0; // trying to maximize this across time steps
+	int strikes = 0; //setting strikes before leaving
+	int x; // x pos for visualization
+	int y; // y pos for visualization[
 	boolean skip_step = false;
 	
 	double[] memory; //tracks familiarity between groups so that they are more likely to join groups that they haven't worked with already
 	
-	boolean in_group = true; //if the agent is in a group, and is unsatisfied, then leave. otherwise, try and find an open group
-	
-	float accumulated_payoff = 0; // trying to maximize this across time steps
-	
 	Normal my_distribution; //this agent's payoff distribution handler
 	
-	public Agent(Environment state, float tolerance, float mean_value, float std_value, int x, int y, int id, int group_id, int type) {
+	public Agent(Environment state, double tolerance, double mean_value, double std_value, int x, int y, int id, int group_id, int type) {
 		// TODO Auto-generated constructor stub
 		super();
 		this.tolerance = tolerance;
@@ -48,17 +50,17 @@ public class Agent implements Steppable {
 		my_distribution = new Normal(mean_value, std_value, state.random);	
 	}
 	
-	public float contribute() {
-		return (float) this.my_distribution.nextDouble();
+	public double contribute() {
+		return this.my_distribution.nextDouble();
 	}
 	
-	public void evaluate(Environment state, float step_payoff) {
+	public void evaluate(Environment state, double step_payoff) {
 		
-		float compared_payoff = step_payoff;
+		double compared_payoff = step_payoff;
 		
 		if(this.in_group) {
 			Group g = (Group) state.groups.get(this.group_id); //get the group, and see how many members there are
-			float num_in_group = (float) g.curr_agents.size();
+			double num_in_group = g.curr_agents.size();
 			compared_payoff = step_payoff/num_in_group;
 			if (!this.skip_step) {
 				this.accumulated_payoff += compared_payoff;
@@ -139,7 +141,7 @@ public class Agent implements Steppable {
 		return null;
 	}
 	
-	public float get_step_payoff(Environment state) {
+	public double get_step_payoff(Environment state) {
 		if(this.in_group) {
 			Group g = (Group) state.groups.get(this.group_id);
 			return g.group_payoff;
@@ -180,13 +182,123 @@ public class Agent implements Steppable {
 //			state.sparseSpace.setObjectLocation(this, random_x, random_y);
 		}
 	}
+	
+	public void group_count(Environment state) {
+		if (this.in_group) {
+			this.group_count = ((Group) state.groups.get(this.group_id)).curr_agents.size();
+			int[] t = ((Group) state.groups.get(this.group_id)).group_constitution();
+			this.num_deviants_in_group = t[1];
+			this.num_standards_in_group = t[0];
+		}
+		else {
+			this.group_count = 0;
+			this.num_deviants_in_group = 0;
+			this.num_standards_in_group = 0;
+		}
+	}
 
 	@Override
 	public void step(SimState state) {
 		Environment e = (Environment) state;
-		float step_payoff = get_step_payoff(e);
+		double step_payoff = get_step_payoff(e);
 		evaluate(e, step_payoff);
-		move(e);
+		//move(e);
+		group_count(e);
+	}
+
+	public double getTolerance() {
+		return tolerance;
+	}
+
+	public void setTolerance(float tolerance) {
+		this.tolerance = tolerance;
+	}
+
+	public double getMean_value() {
+		return mean_value;
+	}
+
+	public void setMean_value(float mean_value) {
+		this.mean_value = mean_value;
+	}
+
+	public double getStd_value() {
+		return std_value;
+	}
+
+	public void setStd_value(float std_value) {
+		this.std_value = std_value;
+	}
+
+	public int getGroup_count() {
+		return group_count;
+	}
+
+	public void setGroup_count(int group_count) {
+		this.group_count = group_count;
+	}
+
+	public int getGroup_id() {
+		return group_id;
+	}
+
+	public void setGroup_id(int group_id) {
+		this.group_id = group_id;
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public int getType() {
+		return type;
+	}
+
+	public void setType(int type) {
+		this.type = type;
+	}
+
+	public int getNum_standards_in_group() {
+		return num_standards_in_group;
+	}
+
+	public void setNum_standards_in_group(int num_standards_in_group) {
+		this.num_standards_in_group = num_standards_in_group;
+	}
+
+	public int getNum_deviants_in_group() {
+		return num_deviants_in_group;
+	}
+
+	public void setNum_deviants_in_group(int num_deviants_in_group) {
+		this.num_deviants_in_group = num_deviants_in_group;
+	}
+
+	public boolean isIn_group() {
+		return in_group;
+	}
+
+	public void setIn_group(boolean in_group) {
+		this.in_group = in_group;
+	}
+
+	public double getAccumulated_payoff() {
+		return accumulated_payoff;
+	}
+
+	public void setAccumulated_payoff(float accumulated_payoff) {
+		this.accumulated_payoff = accumulated_payoff;
+	}
+	
+	public Stoppable getEvent() {
+		return event;
+	}
+	public void setEvent(Stoppable event) {
+		this.event = event;
 	}
 
 }
