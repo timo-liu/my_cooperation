@@ -36,7 +36,7 @@ public class Environment extends SimDataCollection {
 	public double  avg_standard_payoff; //average payoff across all standard agents
 	
 	public static void main(String[] args) {
-		Environment environment = new Environment("test_input.txt");
+		Environment environment = new Environment("Run0.txt");
 	}
 	
 	//constructor 
@@ -113,7 +113,7 @@ public class Environment extends SimDataCollection {
 					num_standards++;
 				}
 
-				Agent agent = new Agent(this, tolerance, mean_value, agent_std_value, random_x, random_y, i, g.group_id, type);
+				Agent agent = new Agent(this, tolerance, mean_value, agent_std_value, random_x, random_y, i, g._group_id, type);
 				agents.add(agent);
 				g.add_agent(agent);
 				schedule.scheduleRepeating(agent, 1, 1.0);
@@ -131,7 +131,7 @@ public class Environment extends SimDataCollection {
 		make_agents();
 		// initialize the experimenter by calling initialize in the parent class
 		Experimenter e = new Experimenter();
-		e.event = schedule.scheduleRepeating(e,1,1);
+		e.event = schedule.scheduleRepeating(e, 2, 1.0);
 	}
 
 	public int getNum_groups() {

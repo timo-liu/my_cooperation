@@ -7,7 +7,7 @@ import sim.util.Bag;
 public class Group implements Steppable {
 	
 	public Bag curr_agents = new Bag();
-	public int group_id;
+	public int _group_id;
 	public int x;
 	public int y;
 	
@@ -17,7 +17,7 @@ public class Group implements Steppable {
 		super();
 		this.x = x;
 		this.y = y;
-		this.group_id = group_id;
+		this._group_id = group_id;
 	}
 	
 	public void add_agent(Agent a) {

@@ -6,8 +6,7 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/MASON"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/SimDataCollection-master"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/MASONplus9"/>
+	<classpathentry kind="lib" path="C:/Users/Timothy/Desktop/PSC 120/mason20.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

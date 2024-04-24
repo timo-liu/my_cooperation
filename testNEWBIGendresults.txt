@@ -5,5 +5,5 @@
 %deviant_mean_tolerance = [2.0, 0.5]
 % ,Test Parameters,Results
 Seed,deviant_mean_tolerance,num_deviants,num_standards,avg_deviant_payoff,avg_standard_payoff,
-1,2.0,14,51,10.119824450356619,10.017232472288843,
-1,0.5,14,51,9.770682258702022,9.973785365562817,
+1,2.0,14,51,101.22391044071742,100.48810890422143,
+1,0.5,14,51,96.1901078041282,100.20435012649084,

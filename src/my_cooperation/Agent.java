@@ -12,21 +12,21 @@ import java.lang.Math;
 public class Agent implements Steppable {
 	//to track
 	public Stoppable event;
-	double tolerance; //on an agent by agent basis, how long can this agent "tolerate" a negative group output from other agents
-	double mean_value; // mean value that an agent will contribute to a team
-	double std_value; //stdev of value that an agent will contribute
-	int group_count; //num agents in group the agent is in at the current step
-	int group_id;
-	int id; // agent unique id
-	int type; // type 1 = deviant, type 0 = standard
-	int num_standards_in_group; //tracking the number of standards in their group if they're in one
-	int num_deviants_in_group; // tracking the number of deviants in their group if they're in one
-	boolean in_group = true; //if the agent is in a group, and is unsatisfied, then leave. otherwise, try and find an open group
-	double accumulated_payoff = 0; // trying to maximize this across time steps
-	int strikes = 0; //setting strikes before leaving
-	int x; // x pos for visualization
-	int y; // y pos for visualization[
-	boolean skip_step = false;
+	public double tolerance; //on an agent by agent basis, how long can this agent "tolerate" a negative group output from other agents
+	public double mean_value; // mean value that an agent will contribute to a team
+	public double std_value; //stdev of value that an agent will contribute
+	public int group_count; //num agents in group the agent is in at the current step
+	public int group_id;
+	public int id; // agent unique id
+	public int type; // type 1 = deviant, type 0 = standard
+	public int num_standards_in_group; //tracking the number of standards in their group if they're in one
+	public int num_deviants_in_group; // tracking the number of deviants in their group if they're in one
+	public boolean in_group = true; //if the agent is in a group, and is unsatisfied, then leave. otherwise, try and find an open group
+	public double accumulated_payoff = 0; // trying to maximize this across time step
+	public int strikes = 0; //setting strikes before leaving
+	public int x; // x pos for visualization
+	public int y; // y pos for visualization[
+	public boolean skip_step = false;
 	
 	double[] memory; //tracks familiarity between groups so that they are more likely to join groups that they haven't worked with already
 	
@@ -96,7 +96,7 @@ public class Agent implements Steppable {
 						if (g != null) {
 							this.skip_step = true;
 							this.in_group = true;
-							this.group_id = g.group_id;
+							this.group_id = g._group_id;
 							g.add_agent(this);
 							}
 				}	
@@ -183,10 +183,11 @@ public class Agent implements Steppable {
 		}
 	}
 	
-	public void group_count(Environment state) {
+	public void count_group(Environment state) {
 		if (this.in_group) {
-			this.group_count = ((Group) state.groups.get(this.group_id)).curr_agents.size();
-			int[] t = ((Group) state.groups.get(this.group_id)).group_constitution();
+			Group g = (Group) state.groups.get(this.group_id);
+			this.group_count = g.curr_agents.numObjs;
+			int[] t = g.group_constitution();
 			this.num_deviants_in_group = t[1];
 			this.num_standards_in_group = t[0];
 		}
@@ -203,102 +204,102 @@ public class Agent implements Steppable {
 		double step_payoff = get_step_payoff(e);
 		evaluate(e, step_payoff);
 		//move(e);
-		group_count(e);
+		count_group(e);
 	}
 
-	public double getTolerance() {
-		return tolerance;
-	}
-
-	public void setTolerance(float tolerance) {
-		this.tolerance = tolerance;
-	}
-
-	public double getMean_value() {
-		return mean_value;
-	}
-
-	public void setMean_value(float mean_value) {
-		this.mean_value = mean_value;
-	}
-
-	public double getStd_value() {
-		return std_value;
-	}
-
-	public void setStd_value(float std_value) {
-		this.std_value = std_value;
-	}
-
-	public int getGroup_count() {
-		return group_count;
-	}
-
-	public void setGroup_count(int group_count) {
-		this.group_count = group_count;
-	}
-
-	public int getGroup_id() {
-		return group_id;
-	}
-
-	public void setGroup_id(int group_id) {
-		this.group_id = group_id;
-	}
-
-	public int getId() {
-		return id;
-	}
-
-	public void setId(int id) {
-		this.id = id;
-	}
-
-	public int getType() {
-		return type;
-	}
-
-	public void setType(int type) {
-		this.type = type;
-	}
-
-	public int getNum_standards_in_group() {
-		return num_standards_in_group;
-	}
-
-	public void setNum_standards_in_group(int num_standards_in_group) {
-		this.num_standards_in_group = num_standards_in_group;
-	}
-
-	public int getNum_deviants_in_group() {
-		return num_deviants_in_group;
-	}
-
-	public void setNum_deviants_in_group(int num_deviants_in_group) {
-		this.num_deviants_in_group = num_deviants_in_group;
-	}
-
-	public boolean isIn_group() {
-		return in_group;
-	}
-
-	public void setIn_group(boolean in_group) {
-		this.in_group = in_group;
-	}
-
-	public double getAccumulated_payoff() {
-		return accumulated_payoff;
-	}
-
-	public void setAccumulated_payoff(float accumulated_payoff) {
-		this.accumulated_payoff = accumulated_payoff;
-	}
-	
-	public Stoppable getEvent() {
-		return event;
-	}
-	public void setEvent(Stoppable event) {
-		this.event = event;
-	}
+//	public double getTolerance() {
+//		return tolerance;
+//	}
+//
+//	public void setTolerance(float tolerance) {
+//		this.tolerance = tolerance;
+//	}
+//
+//	public double getMean_value() {
+//		return mean_value;
+//	}
+//
+//	public void setMean_value(float mean_value) {
+//		this.mean_value = mean_value;
+//	}
+//
+//	public double getStd_value() {
+//		return std_value;
+//	}
+//
+//	public void setStd_value(float std_value) {
+//		this.std_value = std_value;
+//	}
+//
+//	public int getGroup_count() {
+//		return group_count;
+//	}
+//
+//	public void setGroup_count(int group_count) {
+//		this.group_count = group_count;
+//	}
+//
+//	public int getGroup_id() {
+//		return group_id;
+//	}
+//
+//	public void setGroup_id(int group_id) {
+//		this.group_id = group_id;
+//	}
+//
+//	public int getId() {
+//		return id;
+//	}
+//
+//	public void setId(int id) {
+//		this.id = id;
+//	}
+//
+//	public int getType() {
+//		return type;
+//	}
+//
+//	public void setType(int type) {
+//		this.type = type;
+//	}
+//
+//	public int getNum_standards_in_group() {
+//		return num_standards_in_group;
+//	}
+//
+//	public void setNum_standards_in_group(int num_standards_in_group) {
+//		this.num_standards_in_group = num_standards_in_group;
+//	}
+//
+//	public int getNum_deviants_in_group() {
+//		return num_deviants_in_group;
+//	}
+//
+//	public void setNum_deviants_in_group(int num_deviants_in_group) {
+//		this.num_deviants_in_group = num_deviants_in_group;
+//	}
+//
+//	public boolean isIn_group() {
+//		return in_group;
+//	}
+//
+//	public void setIn_group(boolean in_group) {
+//		this.in_group = in_group;
+//	}
+//
+//	public double getAccumulated_payoff() {
+//		return accumulated_payoff;
+//	}
+//
+//	public void setAccumulated_payoff(float accumulated_payoff) {
+//		this.accumulated_payoff = accumulated_payoff;
+//	}
+//	
+//	public Stoppable getEvent() {
+//		return event;
+//	}
+//	public void setEvent(Stoppable event) {
+//		this.event = event;
+//	}
 
 }

@@ -16,9 +16,9 @@
 % Comments (any text to be ignored when running the simulation) are indicated by the '%' character.
 % Key Parameters:
 *seed = 1 % random seed used for the first replicate for each combination of parameter values (incremented for each additional replicate)
-*steps = 10 % number of timesteps each simulation is run for
+*steps = 100 % number of timesteps each simulation is run for
 *reps = 1 % number of simulations run for each combination of parameter values
-*fname = test % beginning of the names of all output files
+*fname = testNEWBIG % beginning of the names of all output files
 *testint = 1 % how often timecourse data is collected (in steps)
 *agentint = 1 % how often agent-level data is collected (defaults to testint)
 % Model Parameters:
@@ -34,10 +34,10 @@ mean_value = 1.0
 std_value = 0.2
 agent_std_value = 0.1
 prop_deviant = 0.2
-deviant_mean_tolerance = 2.0
+deviant_mean_tolerance = 2.0 0.5
 num_deviants = 
 num_standards = 
 avg_deviant_payoff = 
 avg_standard_payoff = 
-% Agent Parameters:
-*agentInfo = group_count group_id id type num_standards_in_group num_deviants_in_group accumulated_payoff 
+% % Agent Parameters:
+% *agentInfo = group_count group_id id type num_standards_in_group num_deviants_in_group accumulated_payoff 
