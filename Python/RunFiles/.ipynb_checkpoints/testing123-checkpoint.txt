@@ -18,7 +18,7 @@
 *seed = 1 % random seed used for the first replicate for each combination of parameter values (incremented for each additional replicate)
 *steps = 100 % number of timesteps each simulation is run for
 *reps = 1 % number of simulations run for each combination of parameter values
-*fname = testNEWBIG % beginning of the names of all output files
+*fname = Python/Results/testing123.txt
 *testint = 1 % how often timecourse data is collected (in steps)
 *agentint = 1 % how often agent-level data is collected (defaults to testint)
 % Model Parameters:
@@ -34,7 +34,7 @@ mean_value = 1.0
 std_value = 0.2
 agent_std_value = 0.1
 prop_deviant = 0.2
-deviant_mean_tolerance = 2.0 0.5
+deviant_mean_tolerance = 2.0
 num_deviants = 
 num_standards = 
 avg_deviant_payoff = 

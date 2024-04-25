@@ -36,7 +36,7 @@ public class Environment extends SimDataCollection {
 	public double  avg_standard_payoff; //average payoff across all standard agents
 	
 	public static void main(String[] args) {
-		Environment environment = new Environment("Run0.txt");
+		Environment environment = new Environment("Python/RunFiles/Run0.txt");
 	}
 	
 	//constructor 
