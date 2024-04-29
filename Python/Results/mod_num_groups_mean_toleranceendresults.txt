@@ -1,0 +1,10 @@
+% Base Parameters: gridHeight = 100, gridWidth = 100, min_distance_groups = 5, num_groups = 13, num_agents_per_group = 5, max_strikes = 3, mean_tolerance = 0.5, std_tolerance = 0.25, mean_value = 1.0, std_value = 0.5, agent_std_value = 0.1, prop_deviant = 0.2, deviant_mean_tolerance = 0.25, 
+
+% Random Parameters: 
+% Test Parameters:
+%deviant_mean_tolerance = [0.25, 1.0, 0.5]
+% ,Test Parameters,Results
+Seed,deviant_mean_tolerance,num_deviants,num_standards,avg_deviant_payoff,avg_standard_payoff,
+1,0.25,14,51,40.11152760459159,41.73322154664293,
+1,1.0,14,51,49.3374863339322,44.04714213217001,
+1,0.5,14,51,46.11581468728,42.27276788950933,

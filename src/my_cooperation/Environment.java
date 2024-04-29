@@ -34,9 +34,9 @@ public class Environment extends SimDataCollection {
 	public int num_standards = 0;
 	public double avg_deviant_payoff; //average payoff across all deviants
 	public double  avg_standard_payoff; //average payoff across all standard agents
-	
+
 	public static void main(String[] args) {
-		Environment environment = new Environment("Python/RunFiles/Run0.txt");
+		Environment environment = new Environment("Python/RunFiles/mod_num_groups_mean_tolerance.txt");
 	}
 	
 	//constructor 
@@ -112,8 +112,9 @@ public class Environment extends SimDataCollection {
 				else {
 					num_standards++;
 				}
-
-				Agent agent = new Agent(this, tolerance, mean_value, agent_std_value, random_x, random_y, i, g._group_id, type);
+				String prefix = "mod_num_groups_mean_tolerance";
+				Agent agent = new Agent(this, tolerance, mean_value, agent_std_value, random_x, random_y, i, g._group_id, type, prefix);
+				i++;
 				agents.add(agent);
 				g.add_agent(agent);
 				schedule.scheduleRepeating(agent, 1, 1.0);

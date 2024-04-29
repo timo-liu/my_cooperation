@@ -6,7 +6,12 @@ import sim.engine.Stoppable;
 import sim.util.Bag;
 import sim.util.distribution.Normal;
 import java.util.Random;
-
+import java.io.BufferedWriter;
+import java.io.File;
+//Writing data manually to file
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.lang.Math;
 
 public class Agent implements Steppable {
@@ -27,12 +32,17 @@ public class Agent implements Steppable {
 	public int x; // x pos for visualization
 	public int y; // y pos for visualization[
 	public boolean skip_step = false;
+	//file to write to
+	public FileWriter write_to;
+	//directory storing agent files
+	public String write_directory = "Python/Agent_data/";
+	public String file_path;
 	
 	double[] memory; //tracks familiarity between groups so that they are more likely to join groups that they haven't worked with already
 	
 	Normal my_distribution; //this agent's payoff distribution handler
 	
-	public Agent(Environment state, double tolerance, double mean_value, double std_value, int x, int y, int id, int group_id, int type) {
+	public Agent(Environment state, double tolerance, double mean_value, double std_value, int x, int y, int id, int group_id, int type, String prefix) {
 		// TODO Auto-generated constructor stub
 		super();
 		this.tolerance = tolerance;
@@ -41,9 +51,37 @@ public class Agent implements Steppable {
 		this.group_id = group_id;
 		this.type = type;
 		
+		try {
+			this.file_path = write_directory + prefix + "_Agent-" + id + ".txt";
+			
+			//check
+			File file = new File(this.file_path);
+			
+			if (!file.exists()) { // Check if the file doesn't exist
+		        this.write_to = new FileWriter(this.file_path);
+		        this.write_to.write("group_count,group_id,id,type,num_standards_in_group,num_deviants_in_group,accumulated_payoff,mean_value,tolerance,deviant_mean_tolerance,num_groups\n");
+		        this.write_to.close();
+		    } else {
+		    	try(FileWriter fw = new FileWriter(this.file_path, true);
+					    BufferedWriter bw = new BufferedWriter(fw);
+					    PrintWriter out = new PrintWriter(bw))
+					{
+					//group_count,group_id,id,type,num_standards_in_group,num_deviants_in_group,accumulated_payoff
+					    out.println("group_count,group_id,id,type,num_standards_in_group,num_deviants_in_group,accumulated_payoff,mean_value,tolerance,deviant_mean_tolerance,num_groups");
+					    out.close();
+					} catch (IOException e) {
+					    //exception handling left as an exercise for the reader
+					}
+		    }
+		    } catch (IOException e) {
+		    System.out.println("An error occurred.");
+		    e.printStackTrace();
+		    }
 		this.id = id;
 		this.x = x;
 		this.y = y;
+		
+		
 		
 		this.memory = new double[state.num_groups];
 		
@@ -197,6 +235,30 @@ public class Agent implements Steppable {
 			this.num_standards_in_group = 0;
 		}
 	}
+	
+	public void writing(Environment env) {
+		try(FileWriter fw = new FileWriter(this.file_path, true);
+			    BufferedWriter bw = new BufferedWriter(fw);
+			    PrintWriter out = new PrintWriter(bw))
+			{
+			//group_count,group_id,id,type,num_standards_in_group,num_deviants_in_group,accumulated_payoff
+			    out.println(String.format("%d,%d,%d,%d,%d,%d,%f,%f,%f,%f,%d", 
+                        this.group_count, 
+                        this.group_id, 
+                        this.id,
+                        this.type, 
+                        this.num_standards_in_group, 
+                        this.num_deviants_in_group, 
+                        this.accumulated_payoff,
+                        this.mean_value,
+                        this.tolerance,
+                        env.deviant_mean_tolerance,
+                        env.num_groups));
+			    out.close();
+			} catch (IOException e) {
+			    //exception handling left as an exercise for the reader
+			}
+	}
 
 	@Override
 	public void step(SimState state) {
@@ -204,7 +266,14 @@ public class Agent implements Steppable {
 		double step_payoff = get_step_payoff(e);
 		evaluate(e, step_payoff);
 		//move(e);
+		
+		if(this.group_id == -1) {
+			System.out.println("Yippee");
+			System.out.println(this.id);
+		}
+		
 		count_group(e);
+		writing(e);
 	}
 
 //	public double getTolerance() {
