@@ -28,6 +28,8 @@ public class Environment extends SimDataCollection {
 	Bag agents = new Bag();
 	
 	public boolean charts = false;
+	
+	public String prefix;
 
 	//data to collect
 	public int num_deviants = 0;
@@ -36,7 +38,7 @@ public class Environment extends SimDataCollection {
 	public double  avg_standard_payoff; //average payoff across all standard agents
 
 	public static void main(String[] args) {
-		Environment environment = new Environment("Python/RunFiles/mod_num_groups_mean_tolerance.txt");
+		Environment environment = new Environment("Python/RunFiles/adjusted_means.txt");
 	}
 	
 	//constructor 
@@ -68,8 +70,8 @@ public class Environment extends SimDataCollection {
 			//				random_y = random.nextInt(gridHeight);
 			//				b = sparseSpace.getMooreNeighbors(random_x, random_y, min_distance_groups, sparseSpace.BOUNDED, false);
 			//			}
-
-			Group g = new Group(random_x, random_y, i);
+			
+			Group g = new Group(random_x, random_y, i, this.prefix);
 			groups.add(g);
 			schedule.scheduleRepeating(g);
 			//			sparseSpace.setObjectLocation(g, random_x, random_y);
@@ -112,12 +114,18 @@ public class Environment extends SimDataCollection {
 				else {
 					num_standards++;
 				}
-				String prefix = "mod_num_groups_mean_tolerance";
-				Agent agent = new Agent(this, tolerance, mean_value, agent_std_value, random_x, random_y, i, g._group_id, type, prefix);
-				i++;
+				Agent agent = new Agent(this, tolerance, mean_value, agent_std_value, random_x, random_y, i, g._group_id, type, this.prefix);
 				agents.add(agent);
 				g.add_agent(agent);
+				
+				String prefix = "adjusted_means_Agent-";
+				String write_directory = "Python/Agent_data/" + prefix;
+				String[] tracked = {"group_count","group_id","id","type","num_standards_in_group","num_deviants_in_group","accumulated_payoff","mean_value","tolerance","deviant_mean_tolerance","num_groups"};
+				Reporter r = new Reporter(agent, Agent.class, Integer.toString(i), tracked, write_directory);
+				i++;
+				
 				schedule.scheduleRepeating(agent, 1, 1.0);
+				schedule.scheduleRepeating(r, 2, 1.0);
 				//				sparseSpace.setObjectLocation(agent, random_x, random_y);
 			}
 		}
@@ -132,7 +140,7 @@ public class Environment extends SimDataCollection {
 		make_agents();
 		// initialize the experimenter by calling initialize in the parent class
 		Experimenter e = new Experimenter();
-		e.event = schedule.scheduleRepeating(e, 2, 1.0);
+		e.event = schedule.scheduleRepeating(e, 3, 1.0);
 	}
 
 	public int getNum_groups() {

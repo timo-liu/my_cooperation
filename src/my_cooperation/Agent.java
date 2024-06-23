@@ -5,6 +5,7 @@ import sim.engine.Steppable;
 import sim.engine.Stoppable;
 import sim.util.Bag;
 import sim.util.distribution.Normal;
+import sim.util.distribution.Beta;
 import java.util.Random;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -38,9 +39,14 @@ public class Agent implements Steppable {
 	public String write_directory = "Python/Agent_data/";
 	public String file_path;
 	
+	//Agent level tracked?
+	public double deviant_mean_tolerance;
+	public int num_groups;
+	
 	double[] memory; //tracks familiarity between groups so that they are more likely to join groups that they haven't worked with already
 	
 	Normal my_distribution; //this agent's payoff distribution handler
+	// Beta my_distribution; //uncomment when I'm ready to use beta functions
 	
 	public Agent(Environment state, double tolerance, double mean_value, double std_value, int x, int y, int id, int group_id, int type, String prefix) {
 		// TODO Auto-generated constructor stub
@@ -51,32 +57,35 @@ public class Agent implements Steppable {
 		this.group_id = group_id;
 		this.type = type;
 		
-		try {
-			this.file_path = write_directory + prefix + "_Agent-" + id + ".txt";
-			
-			//check
-			File file = new File(this.file_path);
-			
-			if (!file.exists()) { // Check if the file doesn't exist
-		        this.write_to = new FileWriter(this.file_path);
-		        this.write_to.write("group_count,group_id,id,type,num_standards_in_group,num_deviants_in_group,accumulated_payoff,mean_value,tolerance,deviant_mean_tolerance,num_groups\n");
-		        this.write_to.close();
-		    } else {
-		    	try(FileWriter fw = new FileWriter(this.file_path, true);
-					    BufferedWriter bw = new BufferedWriter(fw);
-					    PrintWriter out = new PrintWriter(bw))
-					{
-					//group_count,group_id,id,type,num_standards_in_group,num_deviants_in_group,accumulated_payoff
-					    out.println("group_count,group_id,id,type,num_standards_in_group,num_deviants_in_group,accumulated_payoff,mean_value,tolerance,deviant_mean_tolerance,num_groups");
-					    out.close();
-					} catch (IOException e) {
-					    //exception handling left as an exercise for the reader
-					}
-		    }
-		    } catch (IOException e) {
-		    System.out.println("An error occurred.");
-		    e.printStackTrace();
-		    }
+		this.deviant_mean_tolerance = state.deviant_mean_tolerance;
+		this.num_groups = state.num_groups;
+//		
+//		try {
+//			this.file_path = write_directory + prefix + "_Agent-" + id + ".txt";
+//			
+//			//check
+//			File file = new File(this.file_path);
+//			
+//			if (!file.exists()) { // Check if the file doesn't exist
+//		        this.write_to = new FileWriter(this.file_path);
+//		        this.write_to.write("group_count,group_id,id,type,num_standards_in_group,num_deviants_in_group,accumulated_payoff,mean_value,tolerance,deviant_mean_tolerance,num_groups\n");
+//		        this.write_to.close();
+//		    } else {
+//		    	try(FileWriter fw = new FileWriter(this.file_path, true);
+//					    BufferedWriter bw = new BufferedWriter(fw);
+//					    PrintWriter out = new PrintWriter(bw))
+//					{
+//					//group_count,group_id,id,type,num_standards_in_group,num_deviants_in_group,accumulated_payoff
+//					    out.println("group_count,group_id,id,type,num_standards_in_group,num_deviants_in_group,accumulated_payoff,mean_value,tolerance,deviant_mean_tolerance,num_groups");
+//					    out.close();
+//					} catch (IOException e) {
+//					    //exception handling left as an exercise for the reader
+//					}
+//		    }
+//		    } catch (IOException e) {
+//		    System.out.println("An error occurred.");
+//		    e.printStackTrace();
+//		    }
 		this.id = id;
 		this.x = x;
 		this.y = y;
@@ -120,13 +129,13 @@ public class Agent implements Steppable {
 			}
 		}
 		else {
+			if (!this.skip_step) {
+				this.accumulated_payoff += compared_payoff;
+			}
+			else {
+				this.skip_step = false;
+			}
 			if (compared_payoff < this.mean_value && Math.abs(this.mean_value - compared_payoff) > this.tolerance) {
-				if (!this.skip_step) {
-					this.accumulated_payoff += compared_payoff;
-				}
-				else {
-					this.skip_step = false;
-				}
 				this.strikes++;
 				if(this.strikes >= state.max_strikes) {
 
@@ -190,6 +199,22 @@ public class Agent implements Steppable {
 	}
 	
 	
+	public double getDeviant_mean_tolerance() {
+		return deviant_mean_tolerance;
+	}
+
+	public void setDeviant_mean_tolerance(double deviant_mean_tolerance) {
+		this.deviant_mean_tolerance = deviant_mean_tolerance;
+	}
+
+	public int getNum_groups() {
+		return num_groups;
+	}
+
+	public void setNum_groups(int num_groups) {
+		this.num_groups = num_groups;
+	}
+
 	public void move(Environment state) {
 		if(this.in_group) {
 			Group g = (Group)state.groups.get(this.group_id);
@@ -268,12 +293,12 @@ public class Agent implements Steppable {
 		//move(e);
 		
 		if(this.group_id == -1) {
-			System.out.println("Yippee");
-			System.out.println(this.id);
+//			System.out.println("Yippee");
+//			System.out.println(this.id);
 		}
 		
 		count_group(e);
-		writing(e);
+		//writing(e);
 	}
 
 //	public double getTolerance() {

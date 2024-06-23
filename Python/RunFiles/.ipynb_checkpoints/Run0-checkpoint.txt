@@ -39,5 +39,6 @@ num_deviants =
 num_standards = 
 avg_deviant_payoff = 
 avg_standard_payoff = 
+prefix = "mod_num_groups_mean_tolerance"
 % % Agent Parameters:
 % *agentInfo = group_count group_id id type num_standards_in_group num_deviants_in_group accumulated_payoff 
