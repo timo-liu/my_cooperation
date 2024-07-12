@@ -3,6 +3,7 @@ package my_cooperation;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.util.Bag;
+import sim.util.distribution.Beta;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -12,55 +13,25 @@ import java.io.PrintWriter;
 
 public class Group implements Steppable {
 	
+	// variables to handle grade returning
+	Beta grade_error_beta_func;
+	public double grade_error_beta;
+	public double grade_error_alpha;
+	
 	public Bag curr_agents = new Bag();
-	public int _group_id;
+	public int group_id;
 	public int x;
 	public int y;
 	
-	public FileWriter write_to;
-	//directory storing agent files
-	public String write_directory = "Python/Group_data/";
-	public String file_path;
-	
-	
 	public int group_count;
-	public int num_standards;
-	public int num_deviants;
 	
-	public float group_payoff;
+	public double group_payoff;
 
-	public Group(int x, int y, int group_id, String prefix) {
+	public Group(int x, int y, int group_id) {
 		super();
 		this.x = x;
 		this.y = y;
-		this._group_id = group_id;
-		
-		try {
-			this.file_path = write_directory + prefix + "Group-" + group_id + ".txt";
-			
-			//check
-			File file = new File(this.file_path);
-			
-			if (!file.exists()) { // Check if the file doesn't exist
-		        this.write_to = new FileWriter(this.file_path);
-		        this.write_to.write("group_count,group_id,num_standards,num_deviants,deviant_mean_tolerance,num_groups\n");
-		        this.write_to.close();
-		    } else {
-		    	try(FileWriter fw = new FileWriter(this.file_path, true);
-					    BufferedWriter bw = new BufferedWriter(fw);
-					    PrintWriter out = new PrintWriter(bw))
-					{
-					//group_count,group_id,id,type,num_standards_in_group,num_deviants_in_group,accumulated_payoff
-					    out.println("group_count,group_id,num_standards,num_deviants,deviant_mean_tolerance,num_groups");
-					    out.close();
-					} catch (IOException e) {
-					    //exception handling left as an exercise for the reader
-					}
-		    }
-		    } catch (IOException e) {
-		    System.out.println("An error occurred.");
-		    e.printStackTrace();
-		    }
+		this.group_id = group_id;
 	}
 	
 	public void add_agent(Agent a) {
@@ -73,7 +44,7 @@ public class Group implements Steppable {
 		}
 	}
 	
-	public void calc_group_payoff() {
+	public void calc_group_payoff(Environment state) {
 		
 		float sum = 0;
 		
@@ -83,51 +54,28 @@ public class Group implements Steppable {
 				sum += a.contribute();
 			}
 		}
-		this.group_payoff = sum;
+		this.group_payoff = update_group_count_and_beta(state, sum/(double)this.group_count);
 	}
 	
-	public int[] group_constitution() {
-		int[] t = new int[2];
-		for(Object b: this.curr_agents) {
-			Agent a = (Agent) b;
-			if(a.type == 0){
-				t[0]++;
-			}
-			else {
-				t[1]++;
-			}
+	public double update_group_count_and_beta(Environment state, double group_payoff) {
+		// TODO
+		// Calculate a new beta/alpha based on the proportion of agents to state.min_agents_in_group
+		if (this.group_count != this.curr_agents.numObjs) {
+			// TODO Update grade_error_beta_func, otherwise leave it
 		}
-		return t;
-	}
-	
-	public void writing(Environment env) {
-		try(FileWriter fw = new FileWriter(this.file_path, true);
-			    BufferedWriter bw = new BufferedWriter(fw);
-			    PrintWriter out = new PrintWriter(bw))
-			{
-			//group_count,group_id,id,type,num_standards_in_group,num_deviants_in_group,accumulated_payoff
-			    out.println(String.format("%d,%d,%d,%d,%f,%d", 
-                        this.group_count, 
-                        this._group_id,
-                        this.num_standards, 
-                        this.num_deviants, 
-                        env.deviant_mean_tolerance,
-                        env.num_groups));
-			    out.close();
-			} catch (IOException e) {
-			    //exception handling left as an exercise for the reader
-			}
+		
+		if (state.letter_grades) {
+			//TODO return some bucketed grades
+			return 1.0;
+		}
+		else {
+			return this.grade_error_beta_func.nextDouble();
+		}
 	}
 	
 	@Override
 	public void step(SimState state) {
-		calc_group_payoff();
-		int[] t = group_constitution();
-		this.num_standards = t[0];
-		this.num_deviants = t[1];
-		this.group_count = this.curr_agents.numObjs;
-		writing((Environment) state);
-		
+		calc_group_payoff((Environment) state);
 	}
 
 }

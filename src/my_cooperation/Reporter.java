@@ -15,11 +15,12 @@ import java.util.Collection;
 
 public class Reporter implements Steppable {
 	
+	Environment state;
 	Object reported;
 	Class reported_class;
 	String unique_id;
 	String[] tracked;
-	
+	String[] header;	
 	// All the file stuff
 	String file_prefix;
 	String file_path;
@@ -33,11 +34,13 @@ public class Reporter implements Steppable {
 	// String[] tracked - A string array of which variables you want to track, should have public get functions for all
 	// String file_prefix - Where you want the file saved to relative to the project, as file_prefix + unique_id.txt
 	
-	public Reporter(Object reported, Class reported_class, String unique_id, String[] tracked, String file_prefix) {
+	public Reporter(Environment state, Object reported, Class reported_class, String unique_id, String[] tracked, String[] header, String file_prefix) {
+		this.state = state;
 		this.reported  = reported;
 		this.reported_class = reported_class;
 		this.unique_id = unique_id;
 		this.tracked = tracked;
+		this.header = header;
 		this.file_prefix = file_prefix;
 		create_file();
 	}
@@ -51,9 +54,11 @@ public class Reporter implements Steppable {
 			
 			if (!file.exists()) { // Check if the file doesn't exist
 		        this.write_to = new FileWriter(this.file_path);
+		        write_header();
 		        this.write_to.write(String.join(",", this.tracked) + '\n');
 		        this.write_to.close();
 		    } else {
+		    	write_header();
 		    	try(FileWriter fw = new FileWriter(this.file_path, true);
 					    BufferedWriter bw = new BufferedWriter(fw);
 					    PrintWriter out = new PrintWriter(bw))
@@ -72,18 +77,35 @@ public class Reporter implements Steppable {
 	}
 	
 	// pulling from syntax from Aviva's code but simpler just to get things to work - Timo
-	public String get_result(String res) {
+	public String get_result(String res, boolean from_state) {
 		String p = "";
-		if(this.reported != null) {
-			try {
-				Field f = this.reported_class.getField(res);
-				// things that don't handle this well will just have to be dealt with elsewhere
-				p = String.valueOf(f.get(this.reported)); //Real simple like, simply don't pass your data as arrays - Timo
-			} catch(NoSuchFieldException e) {
-				// that's okay, this will just have to be dealt with in the subclass
-			} catch(IllegalAccessException e) {
-				// this is also hypothetically okay, but should tell the user
-				System.out.println("Unable to access " + res + ".");
+		if(!from_state){
+			if(this.reported != null) {
+				try {
+					Field f = this.reported_class.getField(res);
+					// things that don't handle this well will just have to be dealt with elsewhere
+					p = String.valueOf(f.get(this.reported)); //Real simple like, simply don't pass your data as arrays - Timo
+				} catch(NoSuchFieldException e) {
+					// that's okay, this will just have to be dealt with in the subclass
+				} catch(IllegalAccessException e) {
+					// this is also hypothetically okay, but should tell the user
+					System.out.println("Unable to access " + res + ".");
+				}
+			}
+			return(p);
+		}
+		else {
+			if(this.state != null) {
+				try {
+					Field f = Environment.class.getField(res);
+					// things that don't handle this well will just have to be dealt with elsewhere
+					p = String.valueOf(f.get(this.state)); //Real simple like, simply don't pass your data as arrays - Timo
+				} catch(NoSuchFieldException e) {
+					// that's okay, this will just have to be dealt with in the subclass
+				} catch(IllegalAccessException e) {
+					// this is also hypothetically okay, but should tell the user
+					System.out.println("Unable to access " + res + ".");
+				}
 			}
 		}
 		return(p);
@@ -93,10 +115,10 @@ public class Reporter implements Steppable {
 		String results = "";
 		for(int i = 0; i<this.tracked.length; i++) {
 			if(i==0) {
-				results += get_result(this.tracked[i]);
+				results += get_result(this.tracked[i], false);
 			}
 			else {
-				results += "," + get_result(this.tracked[i]);
+				results += "," + get_result(this.tracked[i], false);
 			}
 		}
 		
@@ -113,11 +135,24 @@ public class Reporter implements Steppable {
 			}
 	}
 	
+	public void write_header() {
+		try(FileWriter fw = new FileWriter(this.file_path, true);
+			    BufferedWriter bw = new BufferedWriter(fw);
+			    PrintWriter out = new PrintWriter(bw))
+			{
+				for(int i = 0; i<this.header.length; i++) {
+					out.println(this.header[i] + ": " + get_result(this.header[i], true));
+				}
+			    out.close();
+			} catch (IOException e) {
+			    //exception handling left as an exercise for the reader
+			}
+	}
+	
 	@Override
 	// step, should be called last, one level before the Experimenter, I guess :shrug: - Timo
 	public void step(SimState arg0) {
 		write_results();
-		
 	}
 
 }

@@ -16,83 +16,47 @@ import java.io.PrintWriter;
 import java.lang.Math;
 
 public class Agent implements Steppable {
-	//to track
 	public Stoppable event;
+	//to track
 	public double tolerance; //on an agent by agent basis, how long can this agent "tolerate" a negative group output from other agents
 	public double mean_value; // mean value that an agent will contribute to a team
 	public double std_value; //stdev of value that an agent will contribute
 	public int group_count; //num agents in group the agent is in at the current step
 	public int group_id;
 	public int id; // agent unique id
-	public int type; // type 1 = deviant, type 0 = standard
-	public int num_standards_in_group; //tracking the number of standards in their group if they're in one
-	public int num_deviants_in_group; // tracking the number of deviants in their group if they're in one
-	public boolean in_group = true; //if the agent is in a group, and is unsatisfied, then leave. otherwise, try and find an open group
 	public double accumulated_payoff = 0; // trying to maximize this across time step
 	public int strikes = 0; //setting strikes before leaving
 	public int x; // x pos for visualization
-	public int y; // y pos for visualization[
-	public boolean skip_step = false;
-	//file to write to
-	public FileWriter write_to;
+	public int y; // y pos for visualization
 	//directory storing agent files
 	public String write_directory = "Python/Agent_data/";
 	public String file_path;
 	
-	//Agent level tracked?
-	public double deviant_mean_tolerance;
-	public int num_groups;
+	//Grade handling
+	public String[] grade_array = {"F-", "F", "F+",
+									"D-", "D", "D+",
+									"C-", "C", "C+",
+									"B-", "B", "B+",
+									"A-", "A", "A+"};
+	public int grade_mean_index; // 0 for F-, 1 for F, and so on
+	public int grade_tolerance;
 	
-	double[] memory; //tracks familiarity between groups so that they are more likely to join groups that they haven't worked with already
+	//Agent level tracked?
+	public int num_groups;
 	
 	Normal my_distribution; //this agent's payoff distribution handler
 	// Beta my_distribution; //uncomment when I'm ready to use beta functions
 	
-	public Agent(Environment state, double tolerance, double mean_value, double std_value, int x, int y, int id, int group_id, int type, String prefix) {
+	public Agent(Environment state, double tolerance, double mean_value, double std_value, int x, int y, int id, int group_id, String prefix) {
 		// TODO Auto-generated constructor stub
 		super();
 		this.tolerance = tolerance;
 		this.mean_value = mean_value;
 		this.std_value = std_value;
 		this.group_id = group_id;
-		this.type = type;
-		
-		this.deviant_mean_tolerance = state.deviant_mean_tolerance;
-		this.num_groups = state.num_groups;
-//		
-//		try {
-//			this.file_path = write_directory + prefix + "_Agent-" + id + ".txt";
-//			
-//			//check
-//			File file = new File(this.file_path);
-//			
-//			if (!file.exists()) { // Check if the file doesn't exist
-//		        this.write_to = new FileWriter(this.file_path);
-//		        this.write_to.write("group_count,group_id,id,type,num_standards_in_group,num_deviants_in_group,accumulated_payoff,mean_value,tolerance,deviant_mean_tolerance,num_groups\n");
-//		        this.write_to.close();
-//		    } else {
-//		    	try(FileWriter fw = new FileWriter(this.file_path, true);
-//					    BufferedWriter bw = new BufferedWriter(fw);
-//					    PrintWriter out = new PrintWriter(bw))
-//					{
-//					//group_count,group_id,id,type,num_standards_in_group,num_deviants_in_group,accumulated_payoff
-//					    out.println("group_count,group_id,id,type,num_standards_in_group,num_deviants_in_group,accumulated_payoff,mean_value,tolerance,deviant_mean_tolerance,num_groups");
-//					    out.close();
-//					} catch (IOException e) {
-//					    //exception handling left as an exercise for the reader
-//					}
-//		    }
-//		    } catch (IOException e) {
-//		    System.out.println("An error occurred.");
-//		    e.printStackTrace();
-//		    }
 		this.id = id;
 		this.x = x;
 		this.y = y;
-		
-		
-		
-		this.memory = new double[state.num_groups];
 		
 		my_distribution = new Normal(mean_value, std_value, state.random);	
 	}
@@ -101,59 +65,116 @@ public class Agent implements Steppable {
 		return this.my_distribution.nextDouble();
 	}
 	
-	public void evaluate(Environment state, double step_payoff) {
+	public void evaluate(Environment state, double compared_payoff) {
+		SimState s = (SimState) state;
+		double current_steps = (double) s.schedule.getSteps();
 		
-		double compared_payoff = step_payoff;
+		Group g = (Group) state.groups.get(this.group_id);
 		
-		if(this.in_group) {
-			Group g = (Group) state.groups.get(this.group_id); //get the group, and see how many members there are
-			double num_in_group = g.curr_agents.size();
-			compared_payoff = step_payoff/num_in_group;
-			if (!this.skip_step) {
-				this.accumulated_payoff += compared_payoff;
-			}
-			else {
-				this.skip_step = false;
-			}
-			
+		this.accumulated_payoff = this.accumulated_payoff + compared_payoff;
+		
+		if (!state.letter_grades) {
 			if (compared_payoff < this.mean_value && Math.abs(this.mean_value - compared_payoff) > this.tolerance) {
 				this.strikes++;
 				if(this.strikes >= state.max_strikes) {
-					this.skip_step = true;
-					this.in_group = false;
-					this.group_id = -1;
+					//leave group, find another
+					// if all groups full, make a new one
+					
+					// TODO impose a PUNISHMENT!!!!!!
+					double punishment = state.divorce_constant * Math.log(current_steps); // for interpretation's sake, we are not actually punishing the students, don't investigate me IRB.
+					this.accumulated_payoff = this.accumulated_payoff - punishment;
+					
 					g.remove_agent(this);
 					this.strikes = 0;
-
+					
+					g = find_new_group(state, this.group_id);
+					if (g != null) {
+						this.group_id = g.group_id;
+						g.add_agent(this);
+						}
+					else {
+						state.make_new_group(this);
+					}	
 				}
-			}
 		}
-		else {
-			if (!this.skip_step) {
-				this.accumulated_payoff += compared_payoff;
-			}
 			else {
-				this.skip_step = false;
-			}
-			if (compared_payoff < this.mean_value && Math.abs(this.mean_value - compared_payoff) > this.tolerance) {
-				this.strikes++;
-				if(this.strikes >= state.max_strikes) {
-
-						Group g = find_new_group(state);
+				int step_grade = percentage_to_grade(compared_payoff);
+				if (this.grade_mean_index > step_grade && step_grade < this.grade_mean_index - this.grade_tolerance) {
+					this.strikes++;
+					if(this.strikes >= state.max_strikes) {
+						//leave group, find another
+						// if all groups full, make a new one
+						
+						// TODO impose a PUNISHMENT!!!!!!
+						double punishment = state.divorce_constant * Math.log(current_steps); // for interpretation's sake, we are not actually punishing the students, don't investigate me IRB.
+						this.accumulated_payoff = this.accumulated_payoff - punishment;
+						
+						g.remove_agent(this);
+						this.strikes = 0;
+						
+						g = find_new_group(state, this.group_id);
 						if (g != null) {
-							this.skip_step = true;
-							this.in_group = true;
-							this.group_id = g._group_id;
+							this.group_id = g.group_id;
 							g.add_agent(this);
 							}
-				}	
+						else {
+							state.make_new_group(this);
+						}	
+					}
+				}
 			}
+		
 		}
 	}
 	
+	public int percentage_to_grade(double percentage) {
+		if (percentage >= 97.0) {
+			return 14;
+		}
+		if (percentage >= 93.0) {
+			return 13;
+		}
+		if (percentage >= 90.0) {
+			return 12;
+		}
+		if (percentage >= 87.0) {
+			return 11;
+		}
+		if (percentage >= 83.0) {
+			return 10;
+		}
+		if (percentage >= 80.0) {
+			return 9;
+		}
+		if (percentage >= 77.0) {
+			return 8;
+		}
+		if (percentage >= 73.0) {
+			return 7;
+		}
+		if (percentage >= 70.0) {
+			return 6;
+		}
+		if (percentage >= 67.0) {
+			return 5;
+		}
+		if (percentage >= 63.0) {
+			return 4;
+		}
+		if (percentage >= 60.0) {
+			return 3;
+		}
+		if (percentage >= 57.0) {
+			return 2;
+		}
+		if (percentage >= 53.0) {
+			return 1;
+		}
+		return 0;
+	}
 	
 	//rework to make it meet a group
-	public Group find_new_group(Environment state) {
+	public Group find_new_group(Environment state, int last_group) {
 		double[] chance_array = new double[state.num_groups];
 		int randomnum = state.random.nextInt(99);
 		
@@ -161,50 +182,29 @@ public class Agent implements Steppable {
 		double higher = 0;
 		
 		double fSum = 0;
-		
-		for(int i = 0; i < this.memory.length; i++) {
-			if(((Group)state.groups.get(i)).curr_agents.size() < state.num_agents_per_group) {
-				fSum = fSum + this.memory[i];
-			}
+		// not currently implemented to evenly distribute agents
+		boolean everything_full = true;
+		for (Object element : state.groups.objs) {
+            Group g = (Group) element;
+            if (g.group_count < state.max_agents_per_group && g.group_id != last_group) {
+            	everything_full = false;
+            }
+        }
+		if (everything_full) {
+			return null;
 		}
-		
-		for(int i = 0; i < this.memory.length; i++) {
-			if(((Group)state.groups.get(i)).curr_agents.size() < state.num_agents_per_group) {
-				chance_array[i] = ((fSum - this.memory[i])/fSum) * 100.0;
+		else {
+			int temp = state.random.nextInt(state.num_groups);
+			while(temp == last_group || ((Group)state.groups.get(temp)).group_count >= state.max_agents_per_group ) {
+				temp = state.random.nextInt(state.num_groups);
 			}
-			else {
-				chance_array[i] = 0.0;
-			}
-			
+			return ((Group)state.groups.get(temp));
 		}
-		
-		for(int i = 0; i < state.num_groups; i++) {
-			lower = higher;
-			higher = higher + chance_array[i];
-			if(randomnum >= lower && randomnum < higher) {
-				return ((Group)state.groups.get(i));
-			}
-		}
-		return null;
 	}
 	
 	public double get_step_payoff(Environment state) {
-		if(this.in_group) {
-			Group g = (Group) state.groups.get(this.group_id);
-			return g.group_payoff;
-		}
-		else {
-			return this.contribute();
-		}
-	}
-	
-	
-	public double getDeviant_mean_tolerance() {
-		return deviant_mean_tolerance;
-	}
-
-	public void setDeviant_mean_tolerance(double deviant_mean_tolerance) {
-		this.deviant_mean_tolerance = deviant_mean_tolerance;
+		Group g = (Group) state.groups.get(this.group_id);
+		return g.group_payoff;
 	}
 
 	public int getNum_groups() {
@@ -216,7 +216,6 @@ public class Agent implements Steppable {
 	}
 
 	public void move(Environment state) {
-		if(this.in_group) {
 			Group g = (Group)state.groups.get(this.group_id);
 			
 			int random_x = state.random.nextInt(5) + g.x;
@@ -230,59 +229,6 @@ public class Agent implements Steppable {
 //				b = state.sparseSpace.getObjectsAtLocation(random_x, random_y);
 //			}
 //			state.sparseSpace.setObjectLocation(this, random_x, random_y);
-		}
-		else {
-			int random_x = state.random.nextInt(state.gridWidth);
-			int random_y = state.random.nextInt(state.gridHeight);
-			
-//			Bag b = state.sparseSpace.getObjectsAtLocation(random_x, random_y);
-//			
-//			while(!(b == null)) {
-//				random_x = state.random.nextInt(state.gridWidth);
-//				random_y = state.random.nextInt(state.gridHeight);
-//				b = state.sparseSpace.getObjectsAtLocation(random_x, random_y);
-//			}
-//			state.sparseSpace.setObjectLocation(this, random_x, random_y);
-		}
-	}
-	
-	public void count_group(Environment state) {
-		if (this.in_group) {
-			Group g = (Group) state.groups.get(this.group_id);
-			this.group_count = g.curr_agents.numObjs;
-			int[] t = g.group_constitution();
-			this.num_deviants_in_group = t[1];
-			this.num_standards_in_group = t[0];
-		}
-		else {
-			this.group_count = 0;
-			this.num_deviants_in_group = 0;
-			this.num_standards_in_group = 0;
-		}
-	}
-	
-	public void writing(Environment env) {
-		try(FileWriter fw = new FileWriter(this.file_path, true);
-			    BufferedWriter bw = new BufferedWriter(fw);
-			    PrintWriter out = new PrintWriter(bw))
-			{
-			//group_count,group_id,id,type,num_standards_in_group,num_deviants_in_group,accumulated_payoff
-			    out.println(String.format("%d,%d,%d,%d,%d,%d,%f,%f,%f,%f,%d", 
-                        this.group_count, 
-                        this.group_id, 
-                        this.id,
-                        this.type, 
-                        this.num_standards_in_group, 
-                        this.num_deviants_in_group, 
-                        this.accumulated_payoff,
-                        this.mean_value,
-                        this.tolerance,
-                        env.deviant_mean_tolerance,
-                        env.num_groups));
-			    out.close();
-			} catch (IOException e) {
-			    //exception handling left as an exercise for the reader
-			}
 	}
 
 	@Override
@@ -290,110 +236,7 @@ public class Agent implements Steppable {
 		Environment e = (Environment) state;
 		double step_payoff = get_step_payoff(e);
 		evaluate(e, step_payoff);
+		// System.out.println("Stuck somehere?");
 		//move(e);
-		
-		if(this.group_id == -1) {
-//			System.out.println("Yippee");
-//			System.out.println(this.id);
-		}
-		
-		count_group(e);
-		//writing(e);
 	}
-
-//	public double getTolerance() {
-//		return tolerance;
-//	}
-//
-//	public void setTolerance(float tolerance) {
-//		this.tolerance = tolerance;
-//	}
-//
-//	public double getMean_value() {
-//		return mean_value;
-//	}
-//
-//	public void setMean_value(float mean_value) {
-//		this.mean_value = mean_value;
-//	}
-//
-//	public double getStd_value() {
-//		return std_value;
-//	}
-//
-//	public void setStd_value(float std_value) {
-//		this.std_value = std_value;
-//	}
-//
-//	public int getGroup_count() {
-//		return group_count;
-//	}
-//
-//	public void setGroup_count(int group_count) {
-//		this.group_count = group_count;
-//	}
-//
-//	public int getGroup_id() {
-//		return group_id;
-//	}
-//
-//	public void setGroup_id(int group_id) {
-//		this.group_id = group_id;
-//	}
-//
-//	public int getId() {
-//		return id;
-//	}
-//
-//	public void setId(int id) {
-//		this.id = id;
-//	}
-//
-//	public int getType() {
-//		return type;
-//	}
-//
-//	public void setType(int type) {
-//		this.type = type;
-//	}
-//
-//	public int getNum_standards_in_group() {
-//		return num_standards_in_group;
-//	}
-//
-//	public void setNum_standards_in_group(int num_standards_in_group) {
-//		this.num_standards_in_group = num_standards_in_group;
-//	}
-//
-//	public int getNum_deviants_in_group() {
-//		return num_deviants_in_group;
-//	}
-//
-//	public void setNum_deviants_in_group(int num_deviants_in_group) {
-//		this.num_deviants_in_group = num_deviants_in_group;
-//	}
-//
-//	public boolean isIn_group() {
-//		return in_group;
-//	}
-//
-//	public void setIn_group(boolean in_group) {
-//		this.in_group = in_group;
-//	}
-//
-//	public double getAccumulated_payoff() {
-//		return accumulated_payoff;
-//	}
-//
-//	public void setAccumulated_payoff(float accumulated_payoff) {
-//		this.accumulated_payoff = accumulated_payoff;
-//	}
-//	
-//	public Stoppable getEvent() {
-//		return event;
-//	}
-//	public void setEvent(Stoppable event) {
-//		this.event = event;
-//	}
-
 }

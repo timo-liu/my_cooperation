@@ -1,0 +1,75 @@
+group_count,group_payoff
+s_per_group: 3
+max_agents_per_group: 4
+num_agents: 60
+min_agents_per_group: 3
+max_agents_per_group: 4
+group_count,group_payoff
+num_agents: 60
+min_agents_per_group: 3
+max_agents_per_group: 4
+group_count,group_payoff
+num_agents: 60
+min_agents_per_group: 3
+max_agents_per_group: 4
+group_count,group_payoff
+num_agents: 60
+min_agents_per_group: 3
+max_agents_per_group: 4
+group_count,group_payoff
+num_agents: 60
+min_agents_per_group: 3
+max_agents_per_group: 4
+group_count,group_payoff
+num_agents: 60
+min_agents_per_group: 3
+max_agents_per_group: 4
+group_count,group_payoff
+num_agents: 60
+min_agents_per_group: 3
+max_agents_per_group: 4
+group_count,group_payoff
+num_agents: 60
+min_agents_per_group: 3
+max_agents_per_group: 4
+group_count,group_payoff
+num_agents: 60
+min_agents_per_group: 3
+max_agents_per_group: 4
+group_count,group_payoff
+num_agents: 60
+min_agents_per_group: 3
+max_agents_per_group: 4
+group_count,group_payoff
+num_agents: 60
+min_agents_per_group: 3
+max_agents_per_group: 4
+group_count,group_payoff
+num_agents: 60
+min_agents_per_group: 3
+max_agents_per_group: 4
+group_count,group_payoff
+num_agents: 60
+min_agents_per_group: 3
+max_agents_per_group: 4
+group_count,group_payoff
+num_agents: 60
+min_agents_per_group: 3
+max_agents_per_group: 4
+group_count,group_payoff
+num_agents: 60
+min_agents_per_group: 3
+max_agents_per_group: 4
+group_count,group_payoff
+num_agents: 60
+min_agents_per_group: 3
+max_agents_per_group: 4
+group_count,group_payoff
+num_agents: 60
+min_agents_per_group: 3
+max_agents_per_group: 4
+group_count,group_payoff
+num_agents: 60
+min_agents_per_group: 3
+max_agents_per_group: 4
+group_count,group_payoff
