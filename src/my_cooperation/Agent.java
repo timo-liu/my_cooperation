@@ -69,7 +69,7 @@ public class Agent implements Steppable {
 		SimState s = (SimState) state;
 		double current_steps = (double) s.schedule.getSteps();
 		
-		Group g = (Group) state.groups.get(this.group_id);
+		Group g = (Group) state.groups.get(this.group_id - 1);
 		
 		this.accumulated_payoff = this.accumulated_payoff + compared_payoff;
 		
@@ -186,7 +186,7 @@ public class Agent implements Steppable {
 		boolean everything_full = true;
 		for (Object element : state.groups.objs) {
             Group g = (Group) element;
-            if (g.group_count < state.max_agents_per_group && g.group_id != last_group) {
+            if (g != null && g.group_count < state.max_agents_per_group && g.group_id != last_group) {
             	everything_full = false;
             }
         }
@@ -203,7 +203,7 @@ public class Agent implements Steppable {
 	}
 	
 	public double get_step_payoff(Environment state) {
-		Group g = (Group) state.groups.get(this.group_id);
+		Group g = (Group) state.groups.get(this.group_id - 1);
 		return g.group_payoff;
 	}
 
@@ -216,7 +216,7 @@ public class Agent implements Steppable {
 	}
 
 	public void move(Environment state) {
-			Group g = (Group)state.groups.get(this.group_id);
+			Group g = (Group)state.groups.get(this.group_id - 1);
 			
 			int random_x = state.random.nextInt(5) + g.x;
 			int random_y = state.random.nextInt(5) + g.y;

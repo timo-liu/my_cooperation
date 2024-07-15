@@ -32,11 +32,11 @@ public class Environment extends SimDataCollection {
 	
 	// Agent related parameters
 	public int num_agents;
-	public float agent_tolerance_alpha;
-	public float agent_tolerance_beta;
-	public float agent_effort_alpha;
-	public float agent_effort_beta;
-	public float agent_std_effort; // one letter grade std? this is within agent std since always drawn from normal for agent
+	public double agent_tolerance_alpha;
+	public double agent_tolerance_beta;
+	public double agent_effort_alpha;
+	public double agent_effort_beta;
+	public double agent_std_effort; // one letter grade std? this is within agent std since always drawn from normal for agent
 	
 	
 	// Group related parameters
@@ -64,9 +64,7 @@ public class Environment extends SimDataCollection {
 	public double  avg_standard_payoff; //average payoff across all standard agents
 
 	public static void main(String[] args) {
-		System.out.println("A");
 		Environment environment = new Environment("Python/RunFiles/new_model_test.txt");
-		System.out.println("B");
 	}
 	
 	//constructor 
@@ -103,12 +101,13 @@ public class Environment extends SimDataCollection {
 			
 			String[] group_tracked = {"group_count", "group_payoff"};
 			String[] group_header = {"num_agents", "min_agents_per_group", "max_agents_per_group"};
-			String group_write_directory = "new_model_test_Group-";
+			String group_write_directory = "Python/Group_data/new_model_test_Group-";
 			
-			Group g = new Group(random_x, random_y, i);
+			Group g = new Group(this, random_x, random_y, i);
 			groups.add(g);
 			schedule.scheduleRepeating(g);
 			Reporter r = new Reporter(this, g, Group.class, Integer.toString(i), group_tracked, group_header, group_write_directory);
+			schedule.scheduleRepeating(r);
 			//			sparseSpace.setObjectLocation(g, random_x, random_y);
 		}
 	}
@@ -124,7 +123,6 @@ public class Environment extends SimDataCollection {
 		for(Object a:this.groups) {
 			Group g = (Group) a;
 			for(int j = 0; j < min_agents_per_group; j++) {
-				System.out.println("F");
 				int random_x = random.nextInt(5) + g.x;
 				int random_y = random.nextInt(5) + g.y;
 
@@ -137,22 +135,18 @@ public class Environment extends SimDataCollection {
 				//				}
 
 				//Agent(Environment state, float tolerance, float mean_value, float std_value, int x, int y, int id, int group_id) {
-				System.out.println("G");
 				double tolerance = tolerance_beta.nextDouble();
-				System.out.println(tolerance); //TODO YOOOOOOOOOOOOOOOOOOOOOOOOO BETA IS BROKEN
 				double mean_value = effort_beta.nextDouble();
-				System.out.println("H");
 				Agent agent = new Agent(this, tolerance, mean_value, agent_std_effort, random_x, random_y, i, g.group_id, this.prefix);
 				agents.add(agent);
 				g.add_agent(agent);
 				
 				String prefix = "new_model_test_Agent-";
 				String write_directory = "Python/Agent_data/" + prefix;
-				String[] tracked = {"group_count","group_id","id","num_standards_in_group","num_deviants_in_group","accumulated_payoff","mean_value","tolerance","num_groups"};
+				String[] tracked = {"group_id","id","accumulated_payoff","mean_value","tolerance"};
 				String[] header = {"num_agents", "min_agents_per_group", "max_agents_per_group"};
 				Reporter r = new Reporter(this, agent, Agent.class, Integer.toString(i), tracked, header, write_directory);
 				i++;
-				System.out.println(i);
 				
 				schedule.scheduleRepeating(agent, 1, 1.0);
 				schedule.scheduleRepeating(r, 2, 1.0);
@@ -166,12 +160,12 @@ public class Environment extends SimDataCollection {
 		int random_x = random.nextInt(gridWidth);
 		int random_y = random.nextInt(gridHeight);
 		
-		String[] group_tracked = {};
-		String[] group_header = {};
-		String group_write_directory = "new_model_test_Group-";
+		String[] group_tracked = {"group_count", "group_payoff"};
+		String[] group_header = {"num_agents", "min_agents_per_group", "max_agents_per_group"};
+		String group_write_directory = "Python/Group_data/new_model_test_Group-";
 		
 		int i = this.groups.numObjs + 1;
-		Group g = new Group(random_x, random_y, i);
+		Group g = new Group(this, random_x, random_y, i);
 		groups.add(g);
 		schedule.scheduleRepeating(g);
 		Reporter r = new Reporter(this, g, Group.class, Integer.toString(i), group_tracked, group_header, group_write_directory);
@@ -187,9 +181,7 @@ public class Environment extends SimDataCollection {
 		//		this.makeSpace(gridWidth, gridHeight);
 		//System.out.println("Made space");
 		make_groups();
-		System.out.println("C");
 		make_agents();
-		System.out.println("D");
 		// initialize the experimenter by calling initialize in the parent class
 		Experimenter e = new Experimenter();
 		e.event = schedule.scheduleRepeating(e, 3, 1.0);

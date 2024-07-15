@@ -27,11 +27,12 @@ public class Group implements Steppable {
 	
 	public double group_payoff;
 
-	public Group(int x, int y, int group_id) {
+	public Group(Environment state, int x, int y, int group_id) {
 		super();
 		this.x = x;
 		this.y = y;
 		this.group_id = group_id;
+		grade_error_beta_func = new Beta(state.grading_error_alpha, state.grading_error_beta, state.random);
 	}
 	
 	public void add_agent(Agent a) {
@@ -46,7 +47,7 @@ public class Group implements Steppable {
 	
 	public void calc_group_payoff(Environment state) {
 		
-		float sum = 0;
+		double sum = 0;
 		
 		if(!this.curr_agents.isEmpty()) {
 			for (Object b: this.curr_agents) {
@@ -76,6 +77,22 @@ public class Group implements Steppable {
 	@Override
 	public void step(SimState state) {
 		calc_group_payoff((Environment) state);
+	} // Generate getters and setters past here
+	
+	public int getGroup_count() {
+		return group_count;
+	}
+
+	public void setGroup_count(int group_count) {
+		this.group_count = group_count;
+	}
+
+	public double getGroup_payoff() {
+		return group_payoff;
+	}
+
+	public void setGroup_payoff(double group_payoff) {
+		this.group_payoff = group_payoff;
 	}
 
 }

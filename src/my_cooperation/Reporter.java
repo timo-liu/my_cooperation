@@ -54,7 +54,9 @@ public class Reporter implements Steppable {
 			
 			if (!file.exists()) { // Check if the file doesn't exist
 		        this.write_to = new FileWriter(this.file_path);
-		        write_header();
+		        for(int i = 0; i<this.header.length; i++) {
+					this.write_to.write("# " + this.header[i] + ": " + get_result(this.header[i], true) + '\n');
+				}
 		        this.write_to.write(String.join(",", this.tracked) + '\n');
 		        this.write_to.close();
 		    } else {
@@ -141,7 +143,7 @@ public class Reporter implements Steppable {
 			    PrintWriter out = new PrintWriter(bw))
 			{
 				for(int i = 0; i<this.header.length; i++) {
-					out.println(this.header[i] + ": " + get_result(this.header[i], true));
+					out.println("# " + this.header[i] + ": " + get_result(this.header[i], true));
 				}
 			    out.close();
 			} catch (IOException e) {
