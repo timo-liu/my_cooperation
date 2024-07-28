@@ -6,7 +6,7 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="src" path="src"/>
-	<classpathentry combineaccessrules="false" kind="src" path="/SimDataCollection-master"/>
-	<classpathentry kind="lib" path="C:/Users/Timothy/Desktop/PSC 120/mason22.jar"/>
+	<classpathentry kind="lib" path="C:/Users/timoy/OneDrive/Desktop/Psychology/mason.22.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/Model"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

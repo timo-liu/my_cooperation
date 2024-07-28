@@ -31,6 +31,8 @@ public class Agent implements Steppable {
 	//directory storing agent files
 	public String write_directory = "Python/Agent_data/";
 	public String file_path;
+	public String step_grade = "n/a"; //default empty unless we are using grade, then grades will update with letters
+	public Boolean loafing_detected = false;
 	
 	//Grade handling
 	public String[] grade_array = {"F-", "F", "F+",
@@ -57,6 +59,8 @@ public class Agent implements Steppable {
 		this.id = id;
 		this.x = x;
 		this.y = y;
+		this.grade_tolerance = Math.min((int) (tolerance * 14.0), 4);
+		this.grade_mean_index = percentage_to_grade(mean_value * 100.0);
 		
 		my_distribution = new Normal(mean_value, std_value, state.random);	
 	}
@@ -76,6 +80,8 @@ public class Agent implements Steppable {
 		if (!state.letter_grades) {
 			if (compared_payoff < this.mean_value && Math.abs(this.mean_value - compared_payoff) > this.tolerance) {
 				this.strikes++;
+				this.loafing_detected = true;
+				g.loafing_detected = true;
 				if(this.strikes >= state.max_strikes) {
 					//leave group, find another
 					// if all groups full, make a new one
@@ -96,10 +102,18 @@ public class Agent implements Steppable {
 						state.make_new_group(this);
 					}	
 				}
+			}
+			else {
+				g.loafing_detected = false;
+				this.loafing_detected = false;
+			}
 		}
 			else {
 				int step_grade = percentage_to_grade(compared_payoff);
+				this.step_grade = grade_array[step_grade];
 				if (this.grade_mean_index > step_grade && step_grade < this.grade_mean_index - this.grade_tolerance) {
+					this.loafing_detected = true;
+					g.loafing_detected = true;
 					this.strikes++;
 					if(this.strikes >= state.max_strikes) {
 						//leave group, find another
@@ -122,9 +136,11 @@ public class Agent implements Steppable {
 						}	
 					}
 				}
+				else {
+					this.loafing_detected = false;
+					g.loafing_detected = false;
+				}
 			}
-		
-		}
 	}
 	
 	public int percentage_to_grade(double percentage) {
@@ -209,6 +225,22 @@ public class Agent implements Steppable {
 
 	public int getNum_groups() {
 		return num_groups;
+	}
+	
+	public String getStep_grade() {
+		return step_grade;
+	}
+
+	public void setStep_grade(String step_grade) {
+		this.step_grade = step_grade;
+	}
+
+	public Boolean getLoafing_detected() {
+		return loafing_detected;
+	}
+
+	public void setLoafing_detected(Boolean loafing_detected) {
+		this.loafing_detected = loafing_detected;
 	}
 
 	public void setNum_groups(int num_groups) {

@@ -64,7 +64,7 @@ public class Environment extends SimDataCollection {
 	public double  avg_standard_payoff; //average payoff across all standard agents
 
 	public static void main(String[] args) {
-		Environment environment = new Environment("Python/RunFiles/new_model_test.txt");
+		Environment environment = new Environment("Python/RunFiles/adjusted_sweeps.txt");
 	}
 	
 	//constructor 
@@ -99,15 +99,15 @@ public class Environment extends SimDataCollection {
 			//				b = sparseSpace.getMooreNeighbors(random_x, random_y, min_distance_groups, sparseSpace.BOUNDED, false);
 			//			}
 			
-			String[] group_tracked = {"group_count", "group_payoff"};
+			String[] group_tracked = {"group_count", "group_payoff", "step_grade", "loafing_detected"};
 			String[] group_header = {"num_agents", "min_agents_per_group", "max_agents_per_group"};
-			String group_write_directory = "Python/Group_data/new_model_test_Group-";
+			String group_write_directory = "Python/Group_data/adjusted_sweeps_Group-";
 			
 			Group g = new Group(this, random_x, random_y, i);
 			groups.add(g);
 			schedule.scheduleRepeating(g);
 			Reporter r = new Reporter(this, g, Group.class, Integer.toString(i), group_tracked, group_header, group_write_directory);
-			schedule.scheduleRepeating(r);
+			schedule.scheduleRepeating(r, 2, 1.0);
 			//			sparseSpace.setObjectLocation(g, random_x, random_y);
 		}
 	}
@@ -141,10 +141,10 @@ public class Environment extends SimDataCollection {
 				agents.add(agent);
 				g.add_agent(agent);
 				
-				String prefix = "new_model_test_Agent-";
+				String prefix = "adjusted_sweeps_Agent-";
 				String write_directory = "Python/Agent_data/" + prefix;
-				String[] tracked = {"group_id","id","accumulated_payoff","mean_value","tolerance"};
-				String[] header = {"num_agents", "min_agents_per_group", "max_agents_per_group"};
+				String[] tracked = {"group_id","id","accumulated_payoff","mean_value","tolerance", "strikes", "step_grade", "loafing_detected", "grade_mean_index", "grade_tolerance"};
+				String[] header = {"num_agents", "min_agents_per_group", "max_agents_per_group", "letter_grades"};
 				Reporter r = new Reporter(this, agent, Agent.class, Integer.toString(i), tracked, header, write_directory);
 				i++;
 				
@@ -160,31 +160,56 @@ public class Environment extends SimDataCollection {
 		int random_x = random.nextInt(gridWidth);
 		int random_y = random.nextInt(gridHeight);
 		
-		String[] group_tracked = {"group_count", "group_payoff"};
+		String[] group_tracked = {"group_count", "group_payoff", "step_grade", "loafing_detected"};
 		String[] group_header = {"num_agents", "min_agents_per_group", "max_agents_per_group"};
-		String group_write_directory = "Python/Group_data/new_model_test_Group-";
+		String group_write_directory = "Python/Group_data/adjusted_sweeps_Group-";
 		
 		int i = this.groups.numObjs + 1;
 		Group g = new Group(this, random_x, random_y, i);
 		groups.add(g);
 		schedule.scheduleRepeating(g);
 		Reporter r = new Reporter(this, g, Group.class, Integer.toString(i), group_tracked, group_header, group_write_directory);
+		schedule.scheduleRepeating(r, 2, 1.0);
 		g.add_agent(a);
 		a.group_id = i;
 		this.num_groups ++;
 		System.out.println("Made group");
 	}
 
-
+	public boolean viability_check() {
+		//agent tolerance checks
+		if((this.agent_tolerance_alpha == 1. || this.agent_tolerance_beta == 1.) && this.agent_tolerance_alpha != this.agent_tolerance_beta) {
+			System.out.println("uniformitivity check where alpha || beta == 1 failed");
+			return false;
+		}
+		if(this.agent_tolerance_alpha >= this.agent_tolerance_beta) {
+			System.out.println("Tolerance alpha >= tolerance beta");
+			return false;
+		}
+		// effort checks
+		if((this.agent_effort_beta >= this.agent_effort_alpha)) {
+			System.out.println("Effort beta >= effort alpha");
+			return false;
+		}
+		else {
+			return true;
+		}
+	}
+	
 	public void start() {
-		super.start();
-		//		this.makeSpace(gridWidth, gridHeight);
-		//System.out.println("Made space");
-		make_groups();
-		make_agents();
-		// initialize the experimenter by calling initialize in the parent class
-		Experimenter e = new Experimenter();
-		e.event = schedule.scheduleRepeating(e, 3, 1.0);
+		if(! viability_check()) {
+			System.out.println("Weakling eliminated");
+		}
+		else {
+			super.start();
+//			this.makeSpace(gridWidth, gridHeight);
+			//System.out.println("Made space");
+			make_groups();
+			make_agents();
+			// initialize the experimenter by calling initialize in the parent class
+			Experimenter e = new Experimenter();
+			e.event = schedule.scheduleRepeating(e, 3, 1.0);
+		}
 	}
 
 }
