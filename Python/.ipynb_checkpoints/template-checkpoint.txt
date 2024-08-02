@@ -39,5 +39,9 @@ agent_effort_beta =
 agent_std_effort =
 min_agents_per_group = 
 max_agents_per_group =
+group_track_rate =
+agent_track_rate =
+group_write_directory =
+agent_write_directory =
 % % Agent Parameters:
 % *agentInfo = group_count group_id id type num_standards_in_group num_deviants_in_group accumulated_payoff 

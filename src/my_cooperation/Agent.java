@@ -29,8 +29,6 @@ public class Agent implements Steppable {
 	public int x; // x pos for visualization
 	public int y; // y pos for visualization
 	//directory storing agent files
-	public String write_directory = "Python/Agent_data/";
-	public String file_path;
 	public String step_grade = "n/a"; //default empty unless we are using grade, then grades will update with letters
 	public Boolean loafing_detected = false;
 	

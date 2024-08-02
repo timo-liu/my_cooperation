@@ -53,7 +53,12 @@ public class Environment extends SimDataCollection {
 	Bag groups = new Bag();
 	Bag agents = new Bag();
 	
+	// tracking parameters
+	public int group_track_rate;
+	public int agent_track_rate;
 	public boolean charts = false;
+	public String group_write_directory;
+	public String agent_write_directory;
 	
 
 	//data to collect
@@ -64,7 +69,7 @@ public class Environment extends SimDataCollection {
 	public double  avg_standard_payoff; //average payoff across all standard agents
 
 	public static void main(String[] args) {
-		Environment environment = new Environment("Python/RunFiles/adjusted_sweeps.txt");
+		Environment environment = new Environment("Python/RunFiles/server_runs_true.txt");
 	}
 	
 	//constructor 
@@ -100,13 +105,13 @@ public class Environment extends SimDataCollection {
 			//			}
 			
 			String[] group_tracked = {"group_count", "group_payoff", "step_grade", "loafing_detected"};
-			String[] group_header = {"num_agents", "min_agents_per_group", "max_agents_per_group", "letter_grades" , "grading_error_alpha", "grading_error_beta", "agent_effort_alpha", "agent_effort_beta", "agent_std_effort", "divorce_constant", "agent_tolerance_alpha", "agent_tolerance_beta", "currseed"};
-			String group_write_directory = "Python/Group_data/adjusted_sweeps_Group-";
+			String[] group_header = {"num_agents", "min_agents_per_group", "max_agents_per_group", "letter_grades" , "grading_error_alpha", "grading_error_beta", "agent_effort_alpha", "agent_effort_beta", "agent_std_effort", "divorce_constant", "agent_tolerance_alpha", "agent_tolerance_beta", "currseed", "group_track_rate", "agent_track_rate"};
+			String group_write_directory = this.group_write_directory + "server_runs_true_Group-";
 			
 			Group g = new Group(this, random_x, random_y, i);
 			groups.add(g);
 			schedule.scheduleRepeating(g);
-			Reporter r = new Reporter(this, g, Group.class, Integer.toString(i), group_tracked, group_header, group_write_directory);
+			Reporter r = new Reporter(this, g, Group.class, Integer.toString(i), group_tracked, group_header, group_write_directory, this.group_track_rate);
 			schedule.scheduleRepeating(r, 2, 1.0);
 			//			sparseSpace.setObjectLocation(g, random_x, random_y);
 		}
@@ -141,11 +146,11 @@ public class Environment extends SimDataCollection {
 				agents.add(agent);
 				g.add_agent(agent);
 				
-				String prefix = "adjusted_sweeps_Agent-";
-				String write_directory = "Python/Agent_data/" + prefix;
+				String prefix = "server_runs_true_Agent-";
+				String write_directory = this.agent_write_directory + prefix;
 				String[] tracked = {"group_id","id","accumulated_payoff","mean_value","tolerance", "strikes", "step_grade", "loafing_detected", "grade_mean_index", "grade_tolerance"};
-				String[] header = {"num_agents", "min_agents_per_group", "max_agents_per_group", "letter_grades" , "grading_error_alpha", "grading_error_beta", "agent_effort_alpha", "agent_effort_beta", "agent_std_effort", "divorce_constant", "agent_tolerance_alpha", "agent_tolerance_beta", "currseed"};
-				Reporter r = new Reporter(this, agent, Agent.class, Integer.toString(i), tracked, header, write_directory);
+				String[] header = {"num_agents", "min_agents_per_group", "max_agents_per_group", "letter_grades" , "grading_error_alpha", "grading_error_beta", "agent_effort_alpha", "agent_effort_beta", "agent_std_effort", "divorce_constant", "agent_tolerance_alpha", "agent_tolerance_beta", "currseed", "group_track_rate", "agent_track_rate"};
+				Reporter r = new Reporter(this, agent, Agent.class, Integer.toString(i), tracked, header, write_directory, this.agent_track_rate);
 				i++;
 				
 				schedule.scheduleRepeating(agent, 1, 1.0);
@@ -161,14 +166,14 @@ public class Environment extends SimDataCollection {
 		int random_y = random.nextInt(gridHeight);
 		
 		String[] group_tracked = {"group_count", "group_payoff", "step_grade", "loafing_detected"};
-		String[] group_header = {"num_agents", "min_agents_per_group", "max_agents_per_group", "letter_grades" , "grading_error_alpha", "grading_error_beta", "agent_effort_alpha", "agent_effort_beta", "agent_std_effort", "divorce_constant", "agent_tolerance_alpha", "agent_tolerance_beta", "currseed"};
-		String group_write_directory = "Python/Group_data/adjusted_sweeps_Group-";
+		String[] group_header = {"num_agents", "min_agents_per_group", "max_agents_per_group", "letter_grades" , "grading_error_alpha", "grading_error_beta", "agent_effort_alpha", "agent_effort_beta", "agent_std_effort", "divorce_constant", "agent_tolerance_alpha", "agent_tolerance_beta", "currseed", "group_track_rate", "agent_track_rate"};
+		String group_write_directory = this.group_write_directory + "server_runs_true_Group-";
 		
 		int i = this.groups.numObjs + 1;
 		Group g = new Group(this, random_x, random_y, i);
 		groups.add(g);
 		schedule.scheduleRepeating(g);
-		Reporter r = new Reporter(this, g, Group.class, Integer.toString(i), group_tracked, group_header, group_write_directory);
+		Reporter r = new Reporter(this, g, Group.class, Integer.toString(i), group_tracked, group_header, group_write_directory, this.group_track_rate);
 		schedule.scheduleRepeating(r, 2, 1.0);
 		g.add_agent(a);
 		a.group_id = i;
@@ -210,6 +215,22 @@ public class Environment extends SimDataCollection {
 			Experimenter e = new Experimenter();
 			e.event = schedule.scheduleRepeating(e, 3, 1.0);
 		}
+	}
+
+	public int getGroup_track_rate() {
+		return group_track_rate;
+	}
+
+	public void setGroup_track_rate(int group_track_rate) {
+		this.group_track_rate = group_track_rate;
+	}
+
+	public int getAgent_track_rate() {
+		return agent_track_rate;
+	}
+
+	public void setAgent_track_rate(int agent_track_rate) {
+		this.agent_track_rate = agent_track_rate;
 	}
 
 }

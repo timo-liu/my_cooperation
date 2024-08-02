@@ -26,7 +26,7 @@ public class Reporter implements Steppable {
 	String file_path;
 	FileWriter write_to;
 	File file;
-	
+	int track_rate;
 	
 	// Object reported - The reported object, typically an Agent, passed as "this"
 	// Class reported_class - Class of the reported object, e.g. Agent
@@ -34,8 +34,9 @@ public class Reporter implements Steppable {
 	// String[] tracked - A string array of which variables you want to track, should have public get functions for all
 	// String file_prefix - Where you want the file saved to relative to the project, as file_prefix + unique_id.txt
 	
-	public Reporter(Environment state, Object reported, Class reported_class, String unique_id, String[] tracked, String[] header, String file_prefix) {
+	public Reporter(Environment state, Object reported, Class reported_class, String unique_id, String[] tracked, String[] header, String file_prefix, int track_rate) {
 		this.state = state;
+		this.track_rate = track_rate;
 		this.reported  = reported;
 		this.reported_class = reported_class;
 		this.unique_id = unique_id;
@@ -57,7 +58,7 @@ public class Reporter implements Steppable {
 		        for(int i = 0; i<this.header.length; i++) {
 					this.write_to.write("# " + this.header[i] + ": " + get_result(this.header[i], true) + '\n');
 				}
-		        this.write_to.write(String.join(",", this.tracked) + '\n');
+		        this.write_to.write(String.join(",", this.tracked) + ",steps" + '\n');
 		        this.write_to.close();
 		    } else {
 		    	write_header();
@@ -66,7 +67,7 @@ public class Reporter implements Steppable {
 					    PrintWriter out = new PrintWriter(bw))
 					{
 					//group_count,group_id,id,type,num_standards_in_group,num_deviants_in_group,accumulated_payoff
-					    out.println(String.join(",", this.tracked));
+					    out.println(String.join(",", this.tracked) + ",steps");
 					    out.close();
 					} catch (IOException e) {
 					    //exception handling left as an exercise for the reader
@@ -124,6 +125,9 @@ public class Reporter implements Steppable {
 			}
 		}
 		
+		//Adding step info
+		results += Integer.toString((int) this.state.schedule.getSteps());
+		
 		
 		try(FileWriter fw = new FileWriter(this.file_path, true);
 			    BufferedWriter bw = new BufferedWriter(fw);
@@ -154,7 +158,9 @@ public class Reporter implements Steppable {
 	@Override
 	// step, should be called last, one level before the Experimenter, I guess :shrug: - Timo
 	public void step(SimState arg0) {
-		write_results();
+		if ((int) this.state.schedule.getSteps() % this.track_rate == 0) {
+			write_results();
+		}
 	}
 
 }

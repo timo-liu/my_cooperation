@@ -16,32 +16,32 @@
 % Comments (any text to be ignored when running the simulation) are indicated by the '%' character.
 % Key Parameters:
 *seed = 1 % random seed used for the first replicate for each combination of parameter values (incremented for each additional replicate)
-*steps = 200 % number of timesteps each simulation is run for
-*reps = 2 % number of simulations run for each combination of parameter values
-*fname = Python/Results/TestingFileSystem % beginning of the names of all output files
+*steps = 200
+*reps = 50
+*fname = Python/test/server_runs_false
 *testint = 1 % how often timecourse data is collected (in steps)
 *agentint = 1 % how often agent-level data is collected (defaults to testint)
 % Model Parameters:
 gridHeight = 100
 gridWidth = 100
 min_distance_groups = 5
-letter_grades = 
-prefix =
-grading_error_alpha =
-grading_error_beta =
-divorce_constant =
-max_strikes =
-num_agents =
-agent_tolerance_alpha =
-agent_tolerance_beta =
-agent_effort_alpha =
-agent_effort_beta =
-agent_std_effort =
-min_agents_per_group = 
-max_agents_per_group =
-group_track_rate =
-agent_track_rate =
-group_write_directory =
-agent_write_directory =
+letter_grades = false
+prefix = server_runs_false
+grading_error_alpha = 150.0
+grading_error_beta = 150.0
+divorce_constant = 100 50 25 10 0
+max_strikes = 3 5 7 11 13
+num_agents = 60
+agent_tolerance_alpha = 1.0 2.0
+agent_tolerance_beta = 1.0 7.0
+agent_effort_alpha = 5.0 10.0
+agent_effort_beta = 1.5 3.0 5.0
+agent_std_effort = 0.01 0.05 0.075 0.1 0.2
+min_agents_per_group = 3
+max_agents_per_group = 4
+group_track_rate = 1
+agent_track_rate = 5
+group_write_directory = Python/test/Group_data/
+agent_write_directory = Python/test/Agent_data/
 % % Agent Parameters:
 % *agentInfo = group_count group_id id type num_standards_in_group num_deviants_in_group accumulated_payoff 
