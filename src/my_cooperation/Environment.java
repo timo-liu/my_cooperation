@@ -100,7 +100,7 @@ public class Environment extends SimDataCollection {
 			//			}
 			
 			String[] group_tracked = {"group_count", "group_payoff", "step_grade", "loafing_detected"};
-			String[] group_header = {"num_agents", "min_agents_per_group", "max_agents_per_group"};
+			String[] group_header = {"num_agents", "min_agents_per_group", "max_agents_per_group", "letter_grades" , "grading_error_alpha", "grading_error_beta", "agent_effort_alpha", "agent_effort_beta", "agent_std_effort", "divorce_constant", "agent_tolerance_alpha", "agent_tolerance_beta", "currseed"};
 			String group_write_directory = "Python/Group_data/adjusted_sweeps_Group-";
 			
 			Group g = new Group(this, random_x, random_y, i);
@@ -144,7 +144,7 @@ public class Environment extends SimDataCollection {
 				String prefix = "adjusted_sweeps_Agent-";
 				String write_directory = "Python/Agent_data/" + prefix;
 				String[] tracked = {"group_id","id","accumulated_payoff","mean_value","tolerance", "strikes", "step_grade", "loafing_detected", "grade_mean_index", "grade_tolerance"};
-				String[] header = {"num_agents", "min_agents_per_group", "max_agents_per_group", "letter_grades"};
+				String[] header = {"num_agents", "min_agents_per_group", "max_agents_per_group", "letter_grades" , "grading_error_alpha", "grading_error_beta", "agent_effort_alpha", "agent_effort_beta", "agent_std_effort", "divorce_constant", "agent_tolerance_alpha", "agent_tolerance_beta", "currseed"};
 				Reporter r = new Reporter(this, agent, Agent.class, Integer.toString(i), tracked, header, write_directory);
 				i++;
 				
@@ -161,7 +161,7 @@ public class Environment extends SimDataCollection {
 		int random_y = random.nextInt(gridHeight);
 		
 		String[] group_tracked = {"group_count", "group_payoff", "step_grade", "loafing_detected"};
-		String[] group_header = {"num_agents", "min_agents_per_group", "max_agents_per_group"};
+		String[] group_header = {"num_agents", "min_agents_per_group", "max_agents_per_group", "letter_grades" , "grading_error_alpha", "grading_error_beta", "agent_effort_alpha", "agent_effort_beta", "agent_std_effort", "divorce_constant", "agent_tolerance_alpha", "agent_tolerance_beta", "currseed"};
 		String group_write_directory = "Python/Group_data/adjusted_sweeps_Group-";
 		
 		int i = this.groups.numObjs + 1;

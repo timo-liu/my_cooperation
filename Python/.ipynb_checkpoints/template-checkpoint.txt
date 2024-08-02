@@ -16,8 +16,8 @@
 % Comments (any text to be ignored when running the simulation) are indicated by the '%' character.
 % Key Parameters:
 *seed = 1 % random seed used for the first replicate for each combination of parameter values (incremented for each additional replicate)
-*steps = 100 % number of timesteps each simulation is run for
-*reps = 1 % number of simulations run for each combination of parameter values
+*steps = 200 % number of timesteps each simulation is run for
+*reps = 2 % number of simulations run for each combination of parameter values
 *fname = Python/Results/TestingFileSystem % beginning of the names of all output files
 *testint = 1 % how often timecourse data is collected (in steps)
 *agentint = 1 % how often agent-level data is collected (defaults to testint)

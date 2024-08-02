@@ -44,15 +44,17 @@ public class Group implements Steppable {
 	
 	public void add_agent(Agent a) {
 		this.curr_agents.add(a);
+		this.group_count = this.curr_agents.size();
 	}
 	
 	public void remove_agent(Agent a) {
 		if (this.curr_agents.contains(a)) {
 			this.curr_agents.remove(a);
+			this.group_count = this.curr_agents.size();
 		}
 	}
 	
-	public void calc_group_payoff(Environment state) {	
+	public void calc_group_payoff(Environment state) {
 		double sum = 0;
 		
 		if(!this.curr_agents.isEmpty()) {
